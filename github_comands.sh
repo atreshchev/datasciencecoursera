@@ -1,16 +1,16 @@
 ### GitHub Troubleshoutings
-### xcrun: error: invalid active developer path (/Library/Developer/CommandLineTools), missing xcrun at: /Library/Developer/CommandLineTools/usr/bin/xcrun
+# xcrun: error: invalid active developer path (/Library/Developer/CommandLineTools), missing xcrun at: /Library/Developer/CommandLineTools/usr/bin/xcrun
 
-# for Mac OS X
+# for Mac OS X:
 xcode-select --install
 
-From a shell go to /usr/bin
+#From a shell go to /usr/bin
 sudo ./git
-Agree to the terms
-Close and reopen RStudio
+#Agree to the terms
+#Close and reopen RStudio
 
 
-## github commands
+### GitHub Commands
 
 get --help
 
