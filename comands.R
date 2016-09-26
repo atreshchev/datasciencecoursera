@@ -4,17 +4,20 @@
 getwd() # my directory
 dir()   # files in directory
 ls()    # environment (objects)
-
 list.files("./datadir")
-
-?anyfunc # HELP
-args(anyfunc)
+rm(list = ls()) # clean environment
 
 setwd("/Users/aleksandr/Documents/R") # full path in Mac OS X
 setwd("C\\Users\\aleksandr\\Documents/R") # full path in Windows
 setwd("../") # relative path: go 1 level up
 setwd("./datadir") # relative path: go to datadir
 
+?anyfunc # HELP
+anyfunc # show fixed arguments and ... arguments (and environment of func)
+args(anyfunc) # show function's arguments
+str(anyfunc) # show function's arguments too
+
+## Files
 file.create("filename")
 file.exists("filename")
 file.info("mytest.R")$mode
@@ -30,50 +33,36 @@ if (!file.exists("datadir")) {
 
 unlink("testdir", recursive = TRUE) # recursive folders deleting
 
-rm(list = ls()) # clean environment
-
-source("file.R")  # run script/load environment/functions
-read.csv("file.csv")
-
-##
+## Basic
 sqrt()
 abs()
 max()
+mean()
 
-
-## Functions
-myfunc <- function(x) {
-  x <- rnorm(100)
-  mean(x)
-}
-
-myfunc2 <- function(x) {
-  x + rnorm(length(x))
-}
-
-myfunc2(4)
-myfunc2(4:10)
-
-
-## Basic
-str(func_name) # show function's arguments
-
-print()
-x <- vector("numeric", length = 10)
-x <- c("a", "b", "c") # T, F == TRUE=1, FALSE=0; 5+4i == complex number...
-x <- 1:10
-attributes()
+paste("Hello", "World!", sep = " ") # get concatinated string
+sprintf("%03d", ID) # specific formatting: adding zeros up to 3- symbols number
 
 x <- 5 # numeric
+x <- 5L # integer
 c(1, 2) # numeric
 c(4, TRUE) #numeric
 x <- 1:6 # integer
 class(x)
+
+x <- c(1, 9, 4, 8, 2, 3, 6, 0, 7, 5)
+sort(x) # get values in right order
+
+x <- vector("numeric", length = 10)
+x <- c("a", "b", "c") # T, F == TRUE=1, FALSE=0; 5+4i == complex number...
+x <- c(x, "d") # vector addition
+x <- 1:10
+print(x)
+
+x <- seq(1.7, 1.9, len = 100)
+
 as.integer(x)
 as.logical(x)
 as.character(x)
-
-mean()
 
 
 ## Matrices
@@ -91,6 +80,40 @@ y <- 4:6
 m <- cbind(x,y)
 m <- rbind(x,y)
 
+# Randomization
+x <- rnorm(100) # get vector of 100 values rnorm
+
+vect <- c(1000:1)
+set.seed(42)
+use <- sample(1000, 10)
+print(vect[use])
+
+# Dates & Times
+d <- as.Date("1970-01-11")
+unclass(x) # the number of days after 1970-01-01!
+
+d <- Sys.Date()
+d # date as string (POSIXct format)
+
+t <- Sys.time()
+t # time as string (POSIXct format)
+unclass(t) # seconds after 1970-01-01!
+
+t1 <- as.POSIXlt(t) # time as list!
+t1 # time as string too (POSIXct format the same as t)
+unclass(t1) # show time's list objects (sec, min, hour, mday, mon, year, ...) and values
+names(unclass(t1)) # show time's list objects' names
+t1$year
+
+Sys.getlocale(category = "LC_ALL")
+Sys.setlocale("LC_TIME", "en_US.UTF-8") # for correct full day/month names parsing
+timestring <- c("January 10, 2012 10:40", "December 9, 2011 9:10")
+t <- strptime(timestring, "%B %d, %Y %H:%M")
+t
+Sys.setlocale("LC_TIME", "ru_RU.UTF-8")
+
+t_gap <- as.POSIXct(Sys.time()) - as.POSIXct(t2) # get time difference in maximal difference time units -- equals as using as.POSIXlt()
+
 
 ## Factors
 x <- factor(c("yes", "yes", "no", "yes", "no"))
@@ -99,7 +122,8 @@ x <- factor(c("yes", "yes", "no", "yes", "no"), levels = c("yes", "no"))
 table(x)
 unclass(x)
 
-attr(x,"levels") # get specfic attributes
+attributes(x) # get all attributes
+attr(x,"levels") # get specfic attributes values
 
 x <- 1:10
 attr(x,"dim") <- c(2, 5) # set! specfic attributes with name "dim"
@@ -108,57 +132,76 @@ attr(x,"dim") <- c(2, 5) # set! specfic attributes with name "dim"
 ## Testing to missing values (NA includes NaN!)
 x <- c(1, 2, NA, NaN, 5, 6)
 is.na(x)
-is.nan(x)
+is.nan(x) # NA includes NaN! but not vice verse
 
 
 ## Data Frames (matrices with row and column names & different types of values in each column/row)
-x <- data.frame(foo = 1:4, bar = c(T, F, T, F))
-nrow(x)
-ncol(x)
+DF <- data.frame(a = 1:4, b = c(T, F, T, F), c = 5:8, d = 4:1)
+nrow(DF)
+ncol(DF)
+colnames(DF)
+rownames(DF)
 
-x$colname # get elements of named column
-length(x$colname[!is.na(x$colname) & x$colname == 222]) # get count of colname elements with specific conditions
+DF$a # get elements of one column
+DF[, c(1,3:4)] # get elements of columns with specific numbers
+DF[, c("a", "c")] # get elements of named columns
+
+DF[!is.na(DF[,"colname1"]),] # get rows with no NA colname1 values
+DF[!is.na(DF[,"colname"]),"colname2"] # get column2 values of rows with no NA colname1 values
+length(DF$a[!is.na(DF$a) & DF$a == 555]) # get count of colname elements with specific conditions
 
 data.matrix() # convert data frame to matrix
 
 
-## Data Table
+## Data Tables (much more faster than data frames)
 library(data.table)
-DF = data.table(x = rnorm(9), y = rep(c("a", "b", "c"), each = 3), z = rnorm(9))
-head(DF, 3) # get 3 first rows
+DT = data.table(x = numeric(0), y = character(0)) # initialize empty data table
+DT = data.table(x = rnorm(9), y = rep(c("a", "b", "c"), each = 3), z = rnorm(9))
+head(DT, 3) # get 3 first rows
 
+DT <- rbind(DT, list(x = 10, y = "d", z = 10)) # adding the new row
 tables() # see all data tables in memory
 
 # Subsetting
 DT[c(2,3)] # subsetting rows
 DT[2,]
 DT[DT$y == "a",]
-DT[, c(2,3)] # subsetting columns
 
-DT[, list(mean(x), sum(z))] # subsetting data table based on 'expression'
-DT[, table(y)]
+DT[, 2:3, with = FALSE] # get columns with specific numbers
+DF[, c("a", "c"), with = FALSE] # get elements of named columns
+DT[, .(a, c)] # get elements of named columns too - where .() is alias of list()
+
+DT[, list(min(x), sum(z), max(y))] # get values matched to 'expression'!
+DT[, table(y)] # get count! of y elements by different values
+
+set.seed(123) # init random number generator with some state
+DT <- data.table(y = sample(letters[1:3], 1E5, TRUE)) # random generate large data
+DT[, .N, by = y] # get count! of y elements by different values -- more slowly: DT[, table(y)] 
 
 # Adding columns
 DT[, newcol := z^2] # adding new column
 # 'expression' may be set as function or in curley brackets (collection of statements)
 DT[, newcol2 := {tmp <- (x + z); log2(tmp + 5)}] # multioperations: first statement does not generate data!
 DT[, newcol3 := x > 0] # adding column values as logical statement result (TRUE, FALSE)
-DT[, newcol4 := mean(x + w), by = a] # ?????
+DT[, newcol4 := mean(x + z), by = a] # set newcol4 values equally calculated for rows agregated by 'a' coulmn values
 
-# Special variables ?????
-set.seed(123);
-DT <- data.table(x = sample(letters[1:3], 1E5, TRUE))
-DT[, .N, by = x]
+# Keys
+DT <- data.table(x = rep(c("a", "b", "c"), each = 100), y = rnorm(300), z = rep(c("a", "b", "c")))
+setkey(DT, z) # set up! future expressions on z column
+DT['a'] # get rows with z == 'a' -- more slowly: DT[DT$z == "a"]
 
-# Keys ?????
-DT <- data.table(x = rep(c("a", "b", "c"), each = 100), y = rnorm(300))
-setkey(DT, x)
-DT['a']
+# Joins
+DT1 <- data.table(x = c('a', 'a', 'b', 'dt1'), y = 1:4)
+DT2 <- data.table(x = c('a', 'b', 'dt2'), z = 5:7)
+merge(DT1, DT2, by = "x", all = TRUE) # join tables on shared column "x" with NA values
 
-# Joins !!!!!!!!!!!! SEE week 1 - cleaning data
-DT1 <- data.table ......
+setkey(DT1, x) # for speeding up join operations
+setkey(DT2, x)
+merge(DT1, DT2) # join tables without NA values
+merge(DT1, DT2, all = TRUE) # join tables with NA values
 
-# Fast reading ???
+
+# Fast reading
 big_df <- data.frame(x = rnorm(1E6), y = rnorm(1E6))
 file <- tempfile()
 write.table(big_df, file = file, row.names = FALSE, col.names = FALSE, sep = "\t", quote = FALSE)
@@ -172,6 +215,7 @@ system.time({mean(DT[DT$SEX==1,]$pwgtp15); mean(DT[DT$SEX==2,]$pwgtp15)})
 system.time({rowMeans(DT)[DT$SEX==1]; rowMeans(DT)[DT$SEX==2]})
 system.time(DT[,mean(pwgtp15),by=SEX]) # very fast calculating average value of the var 'pwgtp15' broken by 'SEX' (с разбивкой по значениям SEX)
 system.time(mean(DT$pwgtp15,by=DT$SEX)) 
+
 
 ## Names of objects
 x <- 1:3
@@ -202,16 +246,14 @@ head(x)
 
 
 ## Reading Data
-read.table() # default separator = space
+DF <- read.table("./data/file.csv", sep = ",", header = TRUE, quote="") # default separator = space
+head(DF) # 1st textstring
 
-fileData <- read.table("./data/file.csv", sep = ",", header = TRUE, quote="")
-head(fileData) # 1st textstring
-
-read.csv() # default separator = comma: ','
-read.csv2()
+DF <- read.csv("file.csv", header = TRUE) # default separator = comma: ","
+DF <- read.csv2() # default separator = semicolon: ";"
 
 readLines() # text files
-source() # code - inverse of dump
+source("file.R")  # run script/load environment/functions - inverse of dump
 dget() # code - inverse of doubt
 load() # saved workspace
 unserialize() # single R objects from binary
@@ -294,8 +336,13 @@ x[x > a] # 'computed index' - условие
 u <- x > "a" # logical indexes' vector: TRUE, FALSE
 
 y <- 1:10
-y == 1 # TRUE & FALSE vector
-y >= 5 # TRUE & FALSE vector
+use <- y == 1 # TRUE & FALSE vector
+use <- y >= 5 # TRUE & FALSE vector
+y[use] # subsetted vector!
+
+y <- c(TRUE, FALSE, FALSE, FALSE, TRUE, FALSE)
+use <- y == TRUE
+y[use]
 
 ## subsetting 2
 x <- list(foo = 1:4, bar = 0.6)
@@ -362,3 +409,73 @@ y <- c(1,1)
 x <- 1:6
 y <- 2:3
 x + y # get integer! vector by multiple - 3x (length(x)/length(y)) adding y to x with shifting y from left to right
+
+
+## Control Structures
+## if
+if(y > 3) {
+  x <-10
+} else {
+  x <- 0
+}
+
+x <- if(y > 3) {10} else {0} # the same
+
+## for
+for (i in 1:10) {
+  print(i)
+}
+
+for (i in 1:10) print(i) # the same
+
+x <- c("a", "b", "c", "d")
+for(i in 1:4) {
+  print(x[i])
+}
+
+for(i in seq_along(x)) {  # print while is not the end
+  print(x[i])
+}
+
+for(letter in x) {
+  print(letter)
+}
+
+x <- matrix(1:6, 2, 3) # 2 rows and 3 columns
+for(i in seq_len(nrow(x))) {
+  for(j in seq_len(ncol(x))) {
+    print(x[i,j])
+  }
+}
+
+## while
+count <- 0
+while (count < 10) {
+  print(count)
+  count <- count + 1
+}
+
+## repeat/break!
+x <- 1
+y <- 1e-8
+repeat { # infinite loop!
+  z <- compute_something_func()
+  if(z < y) {
+    break # only way to exit repeat loop!
+  } else {
+    x <- z
+  }
+}
+
+## next
+for (i in 1:100) {
+  if(i <= 20) {
+    next # skip first steps to next loop iterations 
+  }
+  print(i)
+}
+
+
+
+
+

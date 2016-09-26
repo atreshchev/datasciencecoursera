@@ -80,3 +80,13 @@ git checkout
 git branch
 git checkout branchname
 git push
+
+
+
+###
+# error: insufficient permission for adding an object to repository database .git/objects
+
+ls -la # get <user> <group>
+chmod -R g+ws *
+chgrp -R <group> *
+git config core.sharedRepository true
