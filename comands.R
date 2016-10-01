@@ -17,6 +17,7 @@ anyfunc # show fixed arguments and ... arguments (and environment of func)
 args(anyfunc) # show function's arguments
 str(anyfunc) # show function's arguments too
 
+
 ## Files
 file.create("filename")
 file.exists("filename")
@@ -33,6 +34,7 @@ if (!file.exists("datadir")) {
 
 unlink("testdir", recursive = TRUE) # recursive folders deleting
 
+
 ## Basic
 sqrt()
 abs()
@@ -48,17 +50,36 @@ c(1, 2) # numeric
 c(4, TRUE) #numeric
 x <- 1:6 # integer
 class(x)
+str(x) # more detailed var info
 
 x <- c(1, 9, 4, 8, 2, 3, 6, 0, 7, 5)
 sort(x) # get values in right order
+order(x) # get vector of true indexes
+order(x, decreasing = TRUE)
+
+sortedDF <- DF[order(DF[, orderedcol]), ] # order data frame by orderedcol values
+
+x <- c(1, 2, 2, 3, 3, 3, 3, 4, 5)
+unique(x)
+
+x <- rep(1, 10) # get vector with 1 repeated 10 times
 
 x <- vector("numeric", length = 10)
 x <- c("a", "b", "c") # T, F == TRUE=1, FALSE=0; 5+4i == complex number...
 x <- c(x, "d") # vector addition
 x <- 1:10
-print(x)
+x <- print(x)
 
 x <- seq(1.7, 1.9, len = 100)
+
+summary(x) # get simple statistics of vector values  - min, 1st qu., median, mean, 3rd qu., max
+
+x <- gl(3, 10) # get vector of factor levels - 3 levels each with 10 replications (ordered)
+x <- gl(3, 1, 3*10, labels = c("M", "F", "NA")) # 3 levels with 1 replication repeating each for 10 times (cycled)
+
+x <- sapply(list(a = 1:10, b = 55:88, c = 99:20), mean)
+str(x)
+attributes(x) # get names of nums
 
 as.integer(x)
 as.logical(x)
@@ -69,7 +90,7 @@ as.character(x)
 x <- list(1, "a", TRUE, 1+4i) # every element in list is a vector!
 
 m <- matrix(nrow = 2, ncol = 3)
-dim(m)
+dim(m) # dimensions (size) of matrix
 m <- matrix(1:6, nrow = 2, ncol = 3)
 
 m <- 1:10
@@ -77,18 +98,65 @@ dim(m) <- c(2, 5)
 
 x <- 1:3
 y <- 4:6
-m <- cbind(x,y)
-m <- rbind(x,y)
+m <- cbind(x, y)
+m <- rbind(x, y)
 
-# Randomization
-x <- rnorm(100) # get vector of 100 values rnorm
+
+## Randomization
+x <- rnorm(100) # generate random vector of 100 values of Normal distribution
+x <- rnorm(100, 1, 2) # mean = 1, standard deviation = 2 (default m = 0, sd = 1)
+
+dnorm() # evaluate the Normal probobility density ('плотность распр.') (with m, sd) at a point/vector of points
+pnorm() # evaluate probabilities of values - cumulative distribution function ('функция распр.') for Normal distribution
+qnorm() # evaluate quantiles -- pnorm(q) = f(q) <-> qnorm(p) = f^-1(p)
+
+x <- runif(100) # get vector of 100 elements in the range [0;1] as normal distribution
+x <- runif(100, min = 0, max = 10) # the range [0;10]
+
+rpois(100, 1) # generate 100 random Poisson variables with a given rate = 1 ('коэффициент' = m)
+ppois(2, 3) # get the probability of variable < 2 if rate = 3
+
+rbinom(100, 1, 0.5) # generate 100 random Binomial variables (binary values!)
+rexp() # Exponential distribution
+rgamma() # Gamma distribution
 
 vect <- c(1000:1)
-set.seed(42)
-use <- sample(1000, 10)
+set.seed(42) # set some seed for reproduce the same pseudo random values
+use <- sample(1000, 10) # get 10 random values of 1000
 print(vect[use])
 
-# Dates & Times
+sample(letters, 5) # get 5 random letters
+
+sample(1:10) # permutation ('перестановка - без повторений')
+sample(letters)
+
+sample(1:10, replace = TRUE) # replacement ('размещение - с повторениями')
+sample(letters, replace = TRUE)
+
+# simple linear model
+set.seed(20)
+x <- rnorm(100)
+e <- rnorm(100, 0, 2) # some noise - Epsilon
+b0 <- 0.5
+b1 <- 2
+y <- b0 + b1 * x + e # linear model
+summary(y) # simple statistics
+plot(x, y)
+
+# simple linear model based on Binomial
+set.seed(20)
+x <- rbinom(100, 1, 0.5)
+e <- rnorm(100, 0, 2) # some noise - Epsilon
+y <- 0.5 + 2 * x + e # linear model
+
+# complicated model combinated linear and Poisson
+set.seed(20)
+x <- rnorm(100)
+log.mu <- 0.5 + 0.3 * x
+y <- rpois(100, exp(log.mu))
+
+
+## Dates & Times
 d <- as.Date("1970-01-11")
 unclass(x) # the number of days after 1970-01-01!
 
@@ -146,11 +214,17 @@ DF$a # get elements of one column
 DF[, c(1,3:4)] # get elements of columns with specific numbers
 DF[, c("a", "c")] # get elements of named columns
 
+DF <- data.frame(col1 = character(), col2 = character())
+DF <- rbind(DF, data.frame(col1 = "val1", col2 = "val2"))
+DF <- cbind() # the same format
+
 DF[!is.na(DF[,"colname1"]),] # get rows with no NA colname1 values
 DF[!is.na(DF[,"colname"]),"colname2"] # get column2 values of rows with no NA colname1 values
 length(DF$a[!is.na(DF$a) & DF$a == 555]) # get count of colname elements with specific conditions
 
 data.matrix() # convert data frame to matrix
+
+with(DF, func(col1, col2)) # evaluate func in data environments (no need to use DF$... names)
 
 
 ## Data Tables (much more faster than data frames)
@@ -158,6 +232,7 @@ library(data.table)
 DT = data.table(x = numeric(0), y = character(0)) # initialize empty data table
 DT = data.table(x = rnorm(9), y = rep(c("a", "b", "c"), each = 3), z = rnorm(9))
 head(DT, 3) # get 3 first rows
+tail(DT, 3) # get 3 last rows
 
 DT <- rbind(DT, list(x = 10, y = "d", z = 10)) # adding the new row
 tables() # see all data tables in memory
@@ -173,6 +248,8 @@ DT[, .(a, c)] # get elements of named columns too - where .() is alias of list()
 
 DT[, list(min(x), sum(z), max(y))] # get values matched to 'expression'!
 DT[, table(y)] # get count! of y elements by different values
+
+subset(DF, col1name == "col1val")$col2 # filter by col1 value to get col2
 
 set.seed(123) # init random number generator with some state
 DT <- data.table(y = sample(letters[1:3], 1E5, TRUE)) # random generate large data
@@ -227,106 +304,6 @@ m <- matrix(1:4, nrow = 2, ncol = 2)
 dimnames(m) <- list(c("a", "b"), c("c", "d")) 
 
 
-## Interfaces to different sources
-file()
-gzfile()
-bzfile()
-url()
-
-download.file("https://site.com/rows.csv?accessType=DOWNLOAD", destfile = "./data/file.csv", method = "curl")
-downloadDate <- date() # current time & date
-
-con <- file("file.txt", "rw")
-data <- read.csv(con)
-close(con)
-
-con <- url("http://www.jhsph.edu", "r")
-x <- readLines(con)
-head(x)
-
-
-## Reading Data
-DF <- read.table("./data/file.csv", sep = ",", header = TRUE, quote="") # default separator = space
-head(DF) # 1st textstring
-
-DF <- read.csv("file.csv", header = TRUE) # default separator = comma: ","
-DF <- read.csv2() # default separator = semicolon: ";"
-
-readLines() # text files
-source("file.R")  # run script/load environment/functions - inverse of dump
-dget() # code - inverse of doubt
-load() # saved workspace
-unserialize() # single R objects from binary
-
-library(xlsx)
-read.xlsx("./data/file.xlsx", sheetIndex = 1, header = TRUE)
-colIndex <- 2:3
-rowIndex <- 1:10
-read.xlsx("./data/file.xlsx", sheetIndex = 1, header = TRUE, colIndex = colIndex, rowIndex = rowIndex)
-read.xlsx2() # more speed but unstable
-
-library(XML)
-doc <- xmlTreeParse("file.xml", useInternal = TRUE)
-rootNode <- xmlRoot(doc)
-xmlName(rootNode) # root node name
-names(rootNode) # main nodes names
-xmlSApply(rootNode, xmlSize) # get count of all nodes
-rootNode[[1]] # get all! exemplars of 1st main node
-rootNode[[1]][[1]] # get the 1st exemplar of 1st main node
-xmlSApply(rootNode[[1]][[1]], xmlName) # get names of node's elements
-
-xmlSApply(rootNode, xmlValue) # get every single node values
-xpathSApply(rootNode, "//name", xmlValue) # get specific nodes values
-# with XPath launguage: 
-# /nodename - top level node
-# //nodename - node at any level
-# nodename[@attr-name] - node with specific attribute
-# nodename[@attr-name='bob'] - node with specific attribute value (TRUE or FALSE answers)
-
-doc <- htmlTreeParse("http://espn.go.com/nfl/team/_/name/bal/baltimore-ravens", useInternal = TRUE)
-scores <- xpathSApply(doc, "//li[@class='score']", xmlValue)
-
-library(jsonlite)
-jsondata <- fromJSON("https://site.com/repos")
-names(jsondata)
-names(jsondata$objname)
-names(jsondata$objname$obj)
-
-myjson <- toJSON(iris, pretty = TRUE) # convert data frame to JSON object
-cat(myjson) # concatenate a lot of elements and print
-
-
-## Speeding of reading
-# 1 - if there are no comments strings in file
-x <- read.table("datatable.txt", comment.char = "")
-
-# 2 - specifying classes of objects
-initial <- read.table("datatable.txt", nrows = 50)
-classes <- sapply(initial, class)
-x <- read.table("datatable.txt", colClasses = classes)
-
-
-## Writing Data
-write.table()
-writeLines()
-dput() # for 1 object only -- reconstruct R object as R code text
-dump() # dget() for multiple objects
-save()
-serialize()
-
-write.xlsx() # use the same arguments as in read.xlsx()
-
-y <- data.frame(a = 1, b = "a")
-dput(y) # print y as R code
-dput(y, file = "y.R") 
-new.y <- dget("y.R") 
-
-x <- "aaa"
-y <- data.frame(a = 1, b = "a")
-dump(c("x", "y"), file = "vars.R") > rm(x, y)
-source("vars.R")
-
-
 ## Subsetting: [] -- element with the same (!) type of object (excluding matrix type), [[]] -- with inner object type, $ -- for named object
 x <- c("a", "b", "c", "d")
 x[1]
@@ -377,13 +354,13 @@ x <- c(3,5,1,10,12,6)
 x[x %in% 1:5] # occurance of x to integer diaposon
 
 
-# Partial matching
+## Partial matching
 x <- list(var = 1:5)
 x$va # first symbols matching
 x[["va", exact = FALSE]] # first symbols matching
 
 
-# NA removing
+## NA removing
 x <- c(1, 2, NA, 4, NA, 5)
 bad <- is.na(x)
 x[!bad]
@@ -476,6 +453,280 @@ for (i in 1:100) {
 }
 
 
+## Loop functions
+# lapply - loop over the list (always!) and evaluate function on each element
+x <- 1:10
+result <- lapply(x, factorial)
+result <- lapply(x, runif) # get the list of 10 objects - vectors of 1-10 random values
+result <- lapply(x, runif, min = 0, max = 10) # the same using arguments of runif (min, max)
+result[[1]]
+
+x <- list(a = 1:10, b = 50:35, c = rnorm(20, 1), d = rnorm(100, 5))
+lapply(x, mean) # get the list of 4 objects (named $a, $b, $c, $d)
+
+x <- list(a = matrix(1:4, 2, 2), b = matrix(1:6, 3, 2))
+lapply(x, function(m) m[,2]) # extract 2nd column of matrices with own ('anonymous') func
+
+# sapply - same as lapply but try to convert the result to vector/matrix/array
+result <- sapply(list(a = 1:10, b = 55:88, c = 99:20), mean) # get vector! of 3 (named!) elements
+result["a"] # equals to result[1]
+
+# apply - evaluating over the margins of an array (return vectors & matrices)
+x <- matrix(rnorm(200), 20, 10) # 1st margin of matrix - 20 rows, 2nd margin - 10 columns
+result <- apply(x, 2, sum) # apply func for each column (as 2nd margin of x) and get a vector
+result <- apply(x, 1, sum) # for each row
+
+rowMeans(x) # optimezed (more fast) functions for matrices
+rowSums(x)
+colMeans(x)
+colSums(x)
+
+x <- matrix(rnorm(200), 20, 10)
+apply(x, 1, quantile, probs = c(0.25, 0.75)) # apply func for each row and get 2-rows (25%, 75% percentiles) matrix with 20 cols 
+
+apply(x[,1:4], 2, mean) # evaluate func for each 1-4 first columns of x
+
+x <- array(rnorm((2*2)*10), c(2, 2, 10)) # get 3-dimensioan array (as 10 matrices 2x2)
+apply(x, c(1,2), mean) # apply func crossing 1st and 2nd margins (for 3rd dimension)  
+
+rowMeans(x, dims = 2) # optimezed (more fast)
+
+# mapply - multivariate version of lapply (for multiple input lists/vectors arguments)
+mapply(rnorm, 1:5, 1:5, 2) # evaluate func 5 times with 1 by 1 values of arguments' vectors (last arg's value is fixed)
+
+# tapply - apply a function over subsets of a vector (considering factor levels from another vector)
+x <- c(rnorm(10), rnorm(10), rnorm(10))
+f <- gl(3, 1, 3*10, labels = c("M","F","NA"))
+tapply(x, f, mean) # equals to sapply(split(x, f), mean)
+
+
+## Spliting vector/data frame considering factor levels
+# 1 factor
+x <- c(rnorm(10), rnorm(10), rnorm(10))
+f <- gl(3, 1, 3*10, labels = c("M","F","NA"))
+result <- split(x, f) # get list of vectors
+result$M
+
+sapply(split(x, f), mean)
+
+s <- split(DF, DF$factorcol) # split data frame considering Month value (for example)
+lapply(s, function(m) colMeans(m[, c("Ozone", "Solar.R", "Wind")]))
+sapply(s, function(m) colMeans(m[, c("Ozone", "Solar.R", "Wind")], na.rm = TRUE)) # simplified result table
+
+# 2 and more factors
+x <- rnorm(10)
+f1 <- gl(2, 5)
+f2 <- gl(5, 2)
+interaction(f1, f2) # combinate all values
+
+result <- split(x, list(f1, f2))
+result <- split(x, list(f1, f2), drop = TRUE) # drop objects for empty factor levels
+str(result) # show detailed objects' info
 
 
 
+### INPUT/OUTPUT DATA INTERFACES
+readLines() # text files
+source("file.R")  # run script/load environment/functions - inverse of dump
+dget() # code - inverse of doubt
+load() # saved workspace
+unserialize() # single R objects from binary
+gzfile() # unarchive file
+bzfile()
+
+download.file("https://site.com/rows.csv?accessType=DOWNLOAD", destfile = "./data/file.csv", method = "curl")
+downloadDate <- date() # current time & date
+
+## Webpages 1
+url <- "http://www.jhsph.edu"
+con <- url(url, "r") # getting content needs to close content after work!
+htmlCode <- readLines(con)
+close(con)
+head(htmlCode)
+htmlCode
+
+##  Webpages 2
+library(httr)
+html <- GET(url) # doesn't need to close content after work!
+html
+names(html) # names of objects associated with webpage (url, status_code, cookies, content, ...)
+
+site <- handle("http://google.com")
+html1 <- GET(handle = site, path = "/")
+html2 <- GET(handle = site, path = "search")
+
+con <- content(html, as = "text")
+library(XML)
+parsedHtml <- htmlParse(con, asText = TRUE)
+xpathSApply(parsedHtml, "//title", xmlValue) # get webpage title
+
+## Webpages with passwords (when status 401)
+url <- "http://httpbin.org/basic-auth/user/passwd"
+html <- GET(url, authenticate("user", "passwd"))
+html
+
+## Web API
+myapp <- oauth_app("myAppName", key = "yourConsumerKey", secret = "yourConsumerSecret")
+sig <- sign_oauth1.0(myapp, token = "yourToken", token_secret = "yourTokenSecret")
+homeTL <- GET("https://api.twitter.com/1.1/statuses/home_timeline.json", sig)
+library(jsonlite)
+jsonData <- fromJSON(toJSON(content(homeTL))) # get data frame from json
+jsonData[1, 1:4]
+
+## Other sources
+con <- file("file.txt", "rw")
+data <- read.csv(con)
+close(con)
+
+DF <- read.table("./data/file.csv", sep = ",", header = TRUE, quote="") # default separator = space
+DF <- read.table(textConnection(gsub("-", "\t", readLines(url))), header = TRUE, skip = 2) # change '-' to white space & skip first strings
+head(DF) # 1st textstring
+
+DF <- read.csv("file.csv", header = TRUE) # default separator = comma: ","
+DF <- read.csv2() # default separator = semicolon: ";"
+
+library(xlsx)
+read.xlsx("./data/file.xlsx", sheetIndex = 1, header = TRUE)
+colIndex <- 2:3
+rowIndex <- 1:10
+read.xlsx("./data/file.xlsx", sheetIndex = 1, header = TRUE, colIndex = colIndex, rowIndex = rowIndex)
+read.xlsx2() # more speed but unstable
+
+library(XML)
+doc <- xmlTreeParse("file.xml", useInternal = TRUE) # allows to use url as filepath
+rootNode <- xmlRoot(doc)
+xmlName(rootNode) # root node name
+names(rootNode) # main nodes names
+xmlSApply(rootNode, xmlSize) # get count of all nodes
+rootNode[[1]] # get all! exemplars of 1st main node
+rootNode[[1]][[1]] # get the 1st exemplar of 1st main node
+xmlSApply(rootNode[[1]][[1]], xmlName) # get names of node's elements
+
+xmlSApply(rootNode, xmlValue) # get every single node values
+xpathSApply(rootNode, "//name", xmlValue) # get specific nodes values
+# with XPath launguage: 
+# /nodename - top level node
+# //nodename - node at any level
+# nodename[@attr-name] - node with specific attribute
+# nodename[@attr-name='bob'] - node with specific attribute value (TRUE or FALSE answers)
+
+doc <- htmlTreeParse("http://espn.go.com/nfl/team/_/name/bal/baltimore-ravens", useInternal = TRUE)
+scores <- xpathSApply(doc, "//li[@class='score']", xmlValue)
+
+library(jsonlite)
+jsondata <- fromJSON("https://site.com/repos")
+names(jsondata)
+names(jsondata$objname)
+names(jsondata$objname$obj)
+
+myjson <- toJSON(iris, pretty = TRUE) # convert data frame to JSON object
+cat(myjson) # concatenate a lot of elements and print
+
+## Speeding of reading
+# 1 - if there are no comments strings in file
+x <- read.table("datatable.txt", comment.char = "")
+
+# 2 - specifying classes of objects
+initial <- read.table("datatable.txt", nrows = 50)
+classes <- sapply(initial, class)
+x <- read.table("datatable.txt", colClasses = classes)
+
+## MySQL
+library(RMySQL)
+DB <- dbConnect(MySQL(), user = "genome",
+                host = "genome-mysql.cse.ucsc.edu") # get handle of server's DBs
+allDBs <- dbGetQuery(DB, "show databases;")
+dbDisconnect(DB)
+
+DB <- dbConnect(MySQL(), user = "genome", db = "hg19",
+                host = "genome-mysql.cse.ucsc.edu") # get handle of specific DB
+allTables <- dbListTables(DB)
+length(allTables)
+allTables[1:5]
+dbListFields(DB, "affyU133Plus2") # get fields of DB's specific table
+dbGetQuery(DB, "select count(*) from affyU133Plus2")
+
+tabData <- dbReadTable(DB, "affyU133Plus2") # read from table
+head(tabData)
+
+query <- dbSendQuery(DB, "select * from affyU133Plus2 where misMatches between 1 and 3")
+tabData <- fetch(query) # read subset from table by SQL query
+quantile(tabData$misMatches)
+
+tabData <- fetch(query, n = 10) # get first 10 matches of query
+dbClearResult(query)
+dim(tabData) # dimensions (size) of data
+dbDisconnect(DB)
+
+## HDF5 (hdfgroup.org)
+source("http://bioconductor.org/biocLite.R")
+biocLite("rhdf5")
+
+library(rhdf5)
+h5file <- "example.h5"
+created <- h5createFile(h5file)
+created
+
+created <- h5createGroup(h5file, "aaa") # create groups in the file
+created <- h5createGroup(h5file, "bbb")
+created <- h5createGroup(h5file, "aaa/ccc")
+h5ls(h5file) # show groups and files in the .h5 file
+
+A <- matrix(1:10, 5, 2)
+h5write(A, h5file, "aaa/A")
+B <- array(seq(0.1, 2.0, by = 0.1), dim = c(5, 2, 2))
+attr(B, "scale") <- "liter"
+h5write(B, h5file, "aaa/ccc/B")
+DF <- data.frame(1L:5L, seq(0, 1, length.out = 5),
+                 c("ab", "cde", "fghi", "a", "s"), stringsAsFactors = FALSE)
+h5write(DF, h5file, "DF")
+h5ls(h5file)
+
+B <- h5read(h5file, "aaa/ccc/B")
+
+h5write(c(12, 13, 14), h5file, "aaa/A", index = list(1:3, 1)) # rewrite 1-3 elements of 1st column in file A
+h5read(h5file, "aaa/A")
+
+## Writing data
+write.table()
+writeLines()
+dput() # for 1 object only -- reconstruct R object as R code text
+dump() # dget() for multiple objects
+save()
+serialize()
+
+write.xlsx() # use the same arguments as in read.xlsx()
+
+y <- data.frame(a = 1, b = "a")
+dput(y) # print y as R code
+dput(y, file = "y.R") 
+new.y <- dget("y.R") 
+
+x <- "aaa"
+y <- data.frame(a = 1, b = "a")
+dump(c("x", "y"), file = "vars.R") > rm(x, y)
+source("vars.R")
+
+
+### PROFILING
+# return user.self (charged time resource to all CPUs for expression/'пользователь') &
+#        elapsed (wall clock - user waiting/'прошло') time in seconds
+system.time({
+  # any expression here
+})
+
+# profiling based on function call stack
+Rprof(tmp <- tempfile()) # DO NOT use together with system.time()!
+f <- myFUNCTION(x) # the function to profile
+Rprof()
+report <- summaryRprof(tmp) # summarizes the output from Rprof()
+unlink(tmp)
+report$by.self
+
+Rprof(tmp <- tempfile(), memory.profiling = TRUE) # profiling of both time and memory
+f <- myFUNCTION(x) # the function to profile
+Rprof()
+report <- summaryRprof(tmp, memory="both")
+unlink(tmp)
+
+Rprofmem() # profile memory allocation only

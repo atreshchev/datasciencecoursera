@@ -82,11 +82,14 @@ git checkout branchname
 git push
 
 
+## ADD FORKED REPOSETORY to computer
+
+git clone https://github.com/atreshchev/ProgrammingAssignment2.git
+
 
 ###
 # error: insufficient permission for adding an object to repository database .git/objects
-
-ls -la # get <user> <group>
 chmod -R g+ws *
-chgrp -R <group> *
-git config core.sharedRepository true
+chgrp -R group *
+git config core.sharedRepository group
+git repack master

@@ -108,3 +108,40 @@ y <- sapply(x, nLL)
 plot(x, exp(-(y - min(y))), type = "l")
 
 
+## Invisible result
+printmessage <- function(x) {
+  if(is.na(x)) {
+    print("x is a missing value!")
+  } else if(x > 0) {
+    print("x is greater than zero")
+  } else {
+    print("x is less than or equal to zero")
+  }
+  invisible(x) # return x value with no printing x
+}
+
+result <- printmessage(10)
+
+
+## Debugging
+# traceback() - print out the function call stack after an error! occurs
+mean(asdsadasd) # object not found
+traceback()
+
+# recover - automatic traceback after any error
+options(error = recover) # global settings while R session is not over
+read.csv("nosuchfile")
+
+# debug() - "debug mode": step through execution of a function one line at a time (press n to next line)
+debug(lm) # argument must be R func (R coded!)
+lm(y ~ x)
+
+# browser() - activate "debug mode" wherever it is called (in R code - lika a print)
+# ...
+
+# trace() - allows you to insert debugging code into a function a specific places
+# ...
+
+# message("Message...") - get red message in console wherever it is called
+# ...
+
