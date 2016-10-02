@@ -13,10 +13,14 @@ setwd("../") # relative path: go 1 level up
 setwd("./datadir") # relative path: go to datadir
 
 ?anyfunc # HELP
+??anyfunc # deep searching
 anyfunc # show fixed arguments and ... arguments (and environment of func)
 args(anyfunc) # show function's arguments
 str(anyfunc) # show function's arguments too
+search() # show loaded packages (environments)
 
+library(pack) # load package
+detach("package:pack") # unload package
 
 ## Files
 file.create("filename")
@@ -41,8 +45,39 @@ abs()
 max()
 mean()
 
+# cos()  sin()  exp()
+# log() log2()  log10()
+
+ceiling(3.475) # round to 4
+floor(3.475) # round to 3
+round(3.475, digits = 2) # round to 3.48 (digits after '.')
+signif(13.475, digits = 4) # round to 13.48 (significant digits in number)
+
+all(x > 0) # check condition for each element and get TRUE/FALSE
+colSums(x < 0) # get result for each column
+all(colSums(x < 0))
+
+quantile(x, na.rm = TRUE) # 'карта вероятностей' 0, 25, 50, 75, 100% (по количеству упорядоченных наблюдений -- e.g. 50% of our selection < some value!)
+quantile(x, probs = c(0.5, 0.7, 0.9)) # fixed probabilities
+
+table(x) # get counts of each value in vector
+table(DF[, 3]) # for 3rd column of DF
+table(x, useNA = "ifany") # useNA = ifany checks missing of values in logical order of values
+
+logicalvect <- DF$col1 == 3 & DF$col2 > 6 # get matches/mismatches TRUE/FALSE vector
+table(DF$col %in% c("aaa", "bbb")) # get count of matches/mismatches (TRUE: n, FALSE: n - table)
+
+table(DF$restname, DF$zipcode) # 2dim table of counts of intersections (different var1 for fixed var2)
+xt <- xtabs(Freq ~ Male + Admit, data = DF) # get counts (variable?) for different combinations of values of Male & Admit variables of DF
+
+xt <- (breaks ~ ., data = DF) # get counts by combinations of different values all ('.') variables (> 2dim)
+ftable(xt) # print flat table (as 2dim view)
+ 
 paste("Hello", "World!", sep = " ") # get concatinated string
 sprintf("%03d", ID) # specific formatting: adding zeros up to 3- symbols number
+
+object.size(x) # get data object size in bytes
+print(object.size(x), units = "Mb") # size in Mb
 
 x <- 5 # numeric
 x <- 5L # integer
@@ -54,13 +89,32 @@ str(x) # more detailed var info
 
 x <- c(1, 9, 4, 8, 2, 3, 6, 0, 7, 5)
 sort(x) # get values in right order
-order(x) # get vector of true indexes
+order(x) # get vector of true indexes! of sorted elements
 order(x, decreasing = TRUE)
+sort(x, na.last = TRUE) # set NA at the end of vector
+
+x[order(x[, 2], decreasing = TRUE), ] # order by values of 2nd column
+x[, order(x[2, ], decreasing = TRUE)] # order by values of 2nd row!
 
 sortedDF <- DF[order(DF[, orderedcol]), ] # order data frame by orderedcol values
+sortedDF <- DF[order(DF$col1), ]
+sortedDF <- DF[order(DF$col1, DF$col2), ] # order by multiple! variables
+sortedDF <- DF[do.call("order", DF[c(col1, col2)]), ] # the same
+
+library(plyr) # can be used 'dplyr' package because of more fast functions -- BUT 'dplyr' delete rownames (shold be added previously as special column!)
+arrange(DF, col1) # the same as order for data frames! -- 'dplyr' delete rownames!!!
+arrange(DF, desc(col1)) # order by decreasing values
+arrange(DF, col1, col2) # multiple order
+
+x <- c(TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, TRUE)
+which(x) # get TRUE elements' indexes!
 
 x <- c(1, 2, 2, 3, 3, 3, 3, 4, 5)
-unique(x)
+unique(x) # get only unique values
+
+x <- c(1, 2, 2, 3, 3, 3, 3, 4, 5)
+y <- c(4, 5, 6, 7, 8, 8, 9, 9, 0)
+intersect(x, y)
 
 x <- rep(1, 10) # get vector with 1 repeated 10 times
 
@@ -70,9 +124,20 @@ x <- c(x, "d") # vector addition
 x <- 1:10
 x <- print(x)
 
-x <- seq(1.7, 1.9, len = 100)
-
 summary(x) # get simple statistics of vector values  - min, 1st qu., median, mean, 3rd qu., max
+
+x <- seq(1.7, 1.9, length = 100) # get 100 values in interval (min = 1.7, max = 1.9)
+x <- seq(1, 10, by = 2) # get seq by step = 2 (while less than max)
+y <- c("a", "b", "e", "d", "f")
+x <- seq(along = y) # get vector of indexes for elements of y
+
+y <- (1:10)
+x <- ifelse(y < 5, TRUE, FALSE) # get vector of epression's results (user specified)
+table(DF$zipWrong, DF$zipCode < 0) # get count of values for variables' combinations (with given condition for one variable)
+
+library(Hmisc)
+zipGroups <- cut2(DF$zipCode, g = 4) # some different wat -- get factor variable with values which represent 4 intervals [ , ), [ , ]
+table(zipGroups) 
 
 x <- gl(3, 10) # get vector of factor levels - 3 levels each with 10 replications (ordered)
 x <- gl(3, 1, 3*10, labels = c("M", "F", "NA")) # 3 levels with 1 replication repeating each for 10 times (cycled)
@@ -85,9 +150,12 @@ as.integer(x)
 as.logical(x)
 as.character(x)
 
+as.numeric(gsub(",", "", numvect)) # ignore ',' in numbers and convert to numeric variables
+
 
 ## Matrices
 x <- list(1, "a", TRUE, 1+4i) # every element in list is a vector!
+unlist(x) # convert list to the vector of uniform ('однородные') values
 
 m <- matrix(nrow = 2, ncol = 3)
 dim(m) # dimensions (size) of matrix
@@ -125,13 +193,12 @@ set.seed(42) # set some seed for reproduce the same pseudo random values
 use <- sample(1000, 10) # get 10 random values of 1000
 print(vect[use])
 
-sample(letters, 5) # get 5 random letters
-
+sample(letters, 5) # get 5 random symbols from letters array
 sample(1:10) # permutation ('перестановка - без повторений')
 sample(letters)
-
 sample(1:10, replace = TRUE) # replacement ('размещение - с повторениями')
 sample(letters, replace = TRUE)
+sample(c("yes", "no"), 10, replace = TRUE)
 
 # simple linear model
 set.seed(20)
@@ -156,39 +223,15 @@ log.mu <- 0.5 + 0.3 * x
 y <- rpois(100, exp(log.mu))
 
 
-## Dates & Times
-d <- as.Date("1970-01-11")
-unclass(x) # the number of days after 1970-01-01!
-
-d <- Sys.Date()
-d # date as string (POSIXct format)
-
-t <- Sys.time()
-t # time as string (POSIXct format)
-unclass(t) # seconds after 1970-01-01!
-
-t1 <- as.POSIXlt(t) # time as list!
-t1 # time as string too (POSIXct format the same as t)
-unclass(t1) # show time's list objects (sec, min, hour, mday, mon, year, ...) and values
-names(unclass(t1)) # show time's list objects' names
-t1$year
-
-Sys.getlocale(category = "LC_ALL")
-Sys.setlocale("LC_TIME", "en_US.UTF-8") # for correct full day/month names parsing
-timestring <- c("January 10, 2012 10:40", "December 9, 2011 9:10")
-t <- strptime(timestring, "%B %d, %Y %H:%M")
-t
-Sys.setlocale("LC_TIME", "ru_RU.UTF-8")
-
-t_gap <- as.POSIXct(Sys.time()) - as.POSIXct(t2) # get time difference in maximal difference time units -- equals as using as.POSIXlt()
-
-
 ## Factors
 x <- factor(c("yes", "yes", "no", "yes", "no"))
 x <- factor(c("yes", "yes", "no", "yes", "no"), levels = c("yes", "no")) 
 
+x <- relevel(x, ref = "no") # get factor with reordered levels
+
 table(x)
 unclass(x)
+as.numeric(x) # get factor variable as 1,2,... (numeric) values' vector
 
 attributes(x) # get all attributes
 attr(x,"levels") # get specfic attributes values
@@ -205,22 +248,62 @@ is.nan(x) # NA includes NaN! but not vice verse
 
 ## Data Frames (matrices with row and column names & different types of values in each column/row)
 DF <- data.frame(a = 1:4, b = c(T, F, T, F), c = 5:8, d = 4:1)
+dim(DF)
 nrow(DF)
 ncol(DF)
+rownames(DF) <- rownames(someDF) # copy rownames to DF
 colnames(DF)
-rownames(DF)
 
 DF$a # get elements of one column
 DF[, c(1,3:4)] # get elements of columns with specific numbers
 DF[, c("a", "c")] # get elements of named columns
 
-DF <- data.frame(col1 = character(), col2 = character())
-DF <- rbind(DF, data.frame(col1 = "val1", col2 = "val2"))
-DF <- cbind() # the same format
-
 DF[!is.na(DF[,"colname1"]),] # get rows with no NA colname1 values
 DF[!is.na(DF[,"colname"]),"colname2"] # get column2 values of rows with no NA colname1 values
 length(DF$a[!is.na(DF$a) & DF$a == 555]) # get count of colname elements with specific conditions
+
+i <- match("colnameX", names(DF)) # get index of 'colnameX' variable
+j <- match("colnameZ", names(DF))
+DF[, i:j]
+DF[, -(i:j)] # get all columns except of specified columns
+
+DF <- data.frame(col1 = character(), col2 = character())
+
+DF$newcol <- rnorm(5) # adding new column
+DF <- cbind(DT, rnorm(5)) # adding new column to the right
+DF <- cbind(rnorm(5), X) # adding new column to the left of DT
+DF <- rbind(DF, data.frame(col1 = "val1", col2 = "val2"))
+DF <- rbind(data.frame(col1 = "val1", col2 = "val2"), DF) # add row to the top of DF
+
+library(plyr) # can be used 'dplyr' package because of more fast functions -- BUT 'dplyr' may delete rownames (shold be added previously as special column!)
+newDF <- mutate(DF, newCol) # add new column to DF (can be used to replacing existing columns) -- 'dplyr' delete rownames!!!
+newDF <- mutate(DF, newCol = existColX - mean(exisColX, na.rm = TRUE))
+rename(DF, c("col_oldname" = "col_newname")) # rename variable of DF -- 'dplyr' has other syntacsis!!!
+arrange() # like order function (see example in ## Basic subsection) -- 'dplyr' delete rownames!!!
+
+library(dplyr)
+select(DF, colX) # return a subset of the columns of DF (does not delete rownames =)
+select(DF, colX:colZ)
+select(DF, -(colX:colZ)) # show columns except specified columns
+filter(DF, colX < 22 & colZ > 15) # extract a subset of rows based on logical conditions -- 'dplyr' delete rownames (shold be added previously as special column!)
+rename(mtcars, col_newname = col_oldname) # rename variable of DF (does not delete rownames =)
+rename(mtcars, col1_newname = col1_oldname, col2_newname = col2_oldname) 
+summarize(group_by(DF, aggregatecol)) # agregate (by 'group_by') and show different values of variable
+summarize(group_by(DF, aggregatecol), min(colX), max(colX), mean(colX)) # agregate (by 'group_by') and evaluate expressions
+
+tempDF <- mutate(DF, year = as.POSIXlt(datecol)$year + 1900)
+summarize(group_by(tempDF, year), min(colX), max(colX), spec_colname = mean(colX)) # agregate data by year value extracted from 'datacol' variable
+# 'pipeline' instructions provided by 'dplyr'
+DF %>% mutate(month = as.POSIXlt(datecol)$mon + 1) %>% group_by(month) %>% summarize(col1 = min(colX), col2 = max(col2), col3 = mean(colX)) # get from DF 'month' & 'col1', 'col2', 'col3' (by aggregation) as data frame
+
+library(reshape2)
+moltenDF <- melt(DF, id = c("carname", "gear", "cyl"), measure.vars = c("mpg", "hp")) # get DF with rows where 'carname - gear - cyl' are duplicated & 'variable - value' are different ("mpg" in top rows, "hp" in lower)
+cylData <- dcast(moltenDF, cyl ~ variable) # agregate molten data frame and count! of different values of varibles ("mpg" & "hp") for dufferent values of "cyl"
+cylData <- dcast(moltenDF, cyl ~ variable, mean) # evaluate mean values of variables ("mpg" & "hp") for dufferent values of "cyl"
+acast() # use for casting as multi-dimensional arrays
+
+library(tidyr)
+# evolution of 'reshape2' and using 'dplyr' pipelines -- see swirl of DS_C3_W3 (lesson 3)!
 
 data.matrix() # convert data frame to matrix
 
@@ -231,8 +314,9 @@ with(DF, func(col1, col2)) # evaluate func in data environments (no need to use 
 library(data.table)
 DT = data.table(x = numeric(0), y = character(0)) # initialize empty data table
 DT = data.table(x = rnorm(9), y = rep(c("a", "b", "c"), each = 3), z = rnorm(9))
-head(DT, 3) # get 3 first rows
+head(DT, 3) # get 3 first rows (6 rows by default   )
 tail(DT, 3) # get 3 last rows
+summary(DT) # counts variables (if character!) and simple statistics for num
 
 DT <- rbind(DT, list(x = 10, y = "d", z = 10)) # adding the new row
 tables() # see all data tables in memory
@@ -321,6 +405,13 @@ y <- c(TRUE, FALSE, FALSE, FALSE, TRUE, FALSE)
 use <- y == TRUE
 y[use]
 
+x <- matrix(1:9, 3, 3)
+x[x[, 2] >= 5, ] # get rows with col2 >= 5
+x[which(x[, 2] >= 5), ] # the same
+
+x[x[, 2] == 4 & x[, 3] == 9, ] # AND
+x[x[, 2] == 4 | x[, 3] == 9, ] # OR
+
 ## subsetting 2
 x <- list(foo = 1:4, bar = 0.6)
 x[1] # get the list-element!!! with element name
@@ -338,7 +429,7 @@ x[[c(1, 3)]] # get 3rd element of 1st element
 x[[1]][[3]] # the same of above
 x[[c(2, 1)]] # get the 1st element of 2nd element
 
-## subsetting 3 (Matrix)
+## subsetting 3 (Matrix / DF)
 x <- matrix(1:6, 2, 3) # i = 2 rows, j = 3 columns
 x[1,2] # get element (not matrix!) from 1st row & 2nd column
 x[1,] # vector
@@ -351,8 +442,9 @@ x[(nrow(x))-1:nrow(x),] # get 2 last rows
 x[nrow(x)-1:nrow(x),] # get rows in reverced order
 
 x <- c(3,5,1,10,12,6)
-x[x %in% 1:5] # occurance of x to integer diaposon
+x[x %in% 1:5] # get elements of occurance of given integer diaposon
 
+DF[DF$col %in% c("aaa", "bbb"), ] # get specific rows 
 
 ## Partial matching
 x <- list(var = 1:5)
@@ -360,7 +452,16 @@ x$va # first symbols matching
 x[["va", exact = FALSE]] # first symbols matching
 
 
-## NA removing
+## NA accounting & removing
+sum(is.na(x)) # get count of NAs
+any(is.na(x)) # at least one NA (get TRUE/FALSE)
+
+colSums(is.na(DF)) # get result for each column
+all(colSums(is.na(DF) == 0))
+
+length(z[,"Ozone"][is.na(z[,"Ozone"])]) # number of NA elements in column "Ozone" of matrix z
+z[ (!is.na(z[,"Ozone"]) & z[,"Ozone"] > 41) & (z[,"Temp"] > 91), ] # filter rows by two columns' values
+
 x <- c(1, 2, NA, 4, NA, 5)
 bad <- is.na(x)
 x[!bad]
@@ -368,11 +469,6 @@ x[!bad]
 y <- c("a", "b", NA, "c", NA, "d")
 good <- complete.cases(x, y) # there is no NA elements,ALSO: works with matrix name analyzing rows' data 
 y[good]
-
-
-## NA accounting
-length(z[,"Ozone"][is.na(z[,"Ozone"])]) # number of NA elements in column "Ozone" of matrix z
-z[ (!is.na(z[,"Ozone"]) & z[,"Ozone"] > 41) & (z[,"Temp"] > 91),] # filter rows by two columns' values
 
 
 ## Vectors and Matrix operations
@@ -386,6 +482,135 @@ y <- c(1,1)
 x <- 1:6
 y <- 2:3
 x + y # get integer! vector by multiple - 3x (length(x)/length(y)) adding y to x with shifting y from left to right
+
+
+## Spliting vector/data frame considering factor levels
+# 1 factor
+x <- c(rnorm(10), rnorm(10), rnorm(10))
+f <- gl(3, 1, 3*10, labels = c("M","F","NA"))
+splitted <- split(x, f) # get list of vectors (for $M, $F, $NA elements)
+splitted$M
+
+sapply(split(x, f), mean) # evaluate expression for each element (vector) of input list which is created by split()
+unlist(lapply(split(x, f), mean)) # the same result (converted from list elements to vector)
+
+s <- split(DF, DF$factorcol) # split data frame considering Month value (for example)
+lapply(s, function(m) colMeans(m[, c("Ozone", "Solar.R", "Wind")]))
+sapply(s, function(m) colMeans(m[, c("Ozone", "Solar.R", "Wind")], na.rm = TRUE)) # simplified result table
+
+# 2 and more factors
+x <- rnorm(10)
+f1 <- gl(2, 5)
+f2 <- gl(5, 2)
+interaction(f1, f2) # combinate all values
+
+result <- split(x, list(f1, f2))
+result <- split(x, list(f1, f2), drop = TRUE) # drop objects for empty factor levels
+str(result) # show detailed objects' info
+
+zipGroups <- cut(DF$zipCode, breaks = quantile(DF$zipCode)) # get factor variable with values which represent 4 intervals ( , ] (as clusters of DF$zipCode)
+split(DF$zipCode, zipGroups)
+table(zipGroups) # get common size (count of elements) of each 'cluster' (groups)
+table(zipGroups, DF$zipCode) # get count of different DF$zipCode's values complies to 'clusters' (groups)
+
+
+## Merging data
+mergedDF <- merge(DFx, DFy, by.x = "solution_id", by.y = "id", all = TRUE) # get common DF based on link columns (all = TRUE means including NA values)
+head(mergedDF) # if DFx & DFy have columns with equals names, then the will be named as .x and .y
+
+intersect(names(DF1), names(DF2)) # get column's names intersection (as name values vector)
+mergedDF <- merge(DFx, DFy, all = TRUE) # merge based on all intersection columns' combinations & fill empty values as NA
+
+library(dplyr) # or 'plyr'
+DF1 <- data.frame(id = sample(1:10), x = rnorm(10))
+DF2 <- data.frame(id = sample(1:10), y = rnorm(10))
+DF3 <- data.frame(id = sample(1:10), z = rnorm(10))
+DF <- join(DF1, DF2) # join 2 data frames by 'id' value by default (as equal column's names)
+DF <- join(DF1, DF2, by = "id")
+DF <- join_all(list(DF1, DF2, DF3)) # join more than 2 data frames
+arrange(DF, id) # order by 'id'
+
+
+## Loop/agregate functions
+# lapply - loop over the list (always!) and evaluate function on each element
+x <- 1:10
+result <- lapply(x, factorial)
+result <- lapply(x, runif) # get the list of 10 objects - vectors of 1-10 random values
+result <- lapply(x, runif, min = 0, max = 10) # the same using arguments of runif (min, max)
+result[[1]]
+
+x <- list(a = 1:10, b = 50:35, c = rnorm(20, 1), d = rnorm(100, 5))
+lapply(x, mean) # get the list of 4 objects (named $a, $b, $c, $d)
+
+x <- list(a = matrix(1:4, 2, 2), b = matrix(1:6, 3, 2))
+lapply(x, function(m) m[,2]) # extract 2nd column of matrices with own ('anonymous') func
+
+# sapply - same as lapply but try to convert the result to vector/matrix/array
+result <- sapply(list(a = 1:10, b = 55:88, c = 99:20), mean) # get vector! of 3 (named!) elements
+result["a"] # equals to result[1]
+
+# apply - evaluating over the margins of an array (return vectors & matrices)
+x <- matrix(rnorm(200), 20, 10) # 1st margin of matrix - 20 rows, 2nd margin - 10 columns
+result <- apply(x, 2, sum) # apply func for each column (as 2nd margin of x) and get a vector
+result <- apply(x, 1, sum) # for each row
+
+rowMeans(x) # optimezed (more fast) functions for matrices
+rowSums(x)
+colMeans(x)
+colSums(x)
+
+x <- matrix(rnorm(200), 20, 10)
+apply(x, 1, quantile, probs = c(0.25, 0.75)) # apply func for each row and get 2-rows (25%, 75% percentiles) matrix with 20 cols 
+
+apply(x[,1:4], 2, mean) # evaluate func for each 1-4 first columns of x
+
+x <- array(rnorm((2*2)*10), c(2, 2, 10)) # get 3-dimensioan array (as 10 matrices 2x2)
+apply(x, c(1,2), mean) # apply func crossing 1st and 2nd margins (for 3rd dimension)  
+
+rowMeans(x, dims = 2) # optimezed (more fast)
+
+# mapply - multivariate version of lapply (for multiple input lists/vectors arguments)
+mapply(rnorm, 1:5, 1:5, 2) # evaluate func 5 times with 1 by 1 values of arguments' vectors (last arg's value is fixed)
+
+# tapply - apply a function over subsets of a vector (incl. splitting 'x' by factor levels from another vector)
+x <- c(rnorm(10), rnorm(10), rnorm(10))
+f <- gl(3, 1, 3*10, labels = c("M","F","NA"))
+tapply(x, f, mean) # agregate by factors 'f' and evaluate mean values of appropriate 'x' -- equals to sapply(split(x, f), mean)
+
+sapply(split(x, f), mean) # another way to tapply
+unlist(lapply(split(x, f), mean))
+
+library(plyr)
+ddply(DF, .(f), summarize, sum = sum(x)) # another way to agregate and evaluate expression (f, x - factor and val columns of DF)
+
+ddply(DF, .(f), summarize, sum = ave(x, FUN = sum)) # using ave() if needs to duplicate sum result for each element of every factor group
+
+
+## Dates & Times
+d <- as.Date("1970-01-11")
+unclass(x) # the number of days after 1970-01-01!
+
+d <- Sys.Date()
+d # date as string (POSIXct format)
+
+t <- Sys.time()
+t # time as string (POSIXct format)
+unclass(t) # seconds after 1970-01-01!
+
+t1 <- as.POSIXlt(t) # time as list!
+t1 # time as string too (POSIXct format the same as t)
+unclass(t1) # show time's list objects (sec, min, hour, mday, mon, year, ...) and values
+names(unclass(t1)) # show time's list objects' names
+t1$year
+
+Sys.getlocale(category = "LC_ALL")
+Sys.setlocale("LC_TIME", "en_US.UTF-8") # for correct full day/month names parsing
+timestring <- c("January 10, 2012 10:40", "December 9, 2011 9:10")
+t <- strptime(timestring, "%B %d, %Y %H:%M")
+t
+Sys.setlocale("LC_TIME", "ru_RU.UTF-8")
+
+t_gap <- as.POSIXct(Sys.time()) - as.POSIXct(t2) # get time difference in maximal difference time units -- equals as using as.POSIXlt()
 
 
 ## Control Structures
@@ -453,78 +678,6 @@ for (i in 1:100) {
 }
 
 
-## Loop functions
-# lapply - loop over the list (always!) and evaluate function on each element
-x <- 1:10
-result <- lapply(x, factorial)
-result <- lapply(x, runif) # get the list of 10 objects - vectors of 1-10 random values
-result <- lapply(x, runif, min = 0, max = 10) # the same using arguments of runif (min, max)
-result[[1]]
-
-x <- list(a = 1:10, b = 50:35, c = rnorm(20, 1), d = rnorm(100, 5))
-lapply(x, mean) # get the list of 4 objects (named $a, $b, $c, $d)
-
-x <- list(a = matrix(1:4, 2, 2), b = matrix(1:6, 3, 2))
-lapply(x, function(m) m[,2]) # extract 2nd column of matrices with own ('anonymous') func
-
-# sapply - same as lapply but try to convert the result to vector/matrix/array
-result <- sapply(list(a = 1:10, b = 55:88, c = 99:20), mean) # get vector! of 3 (named!) elements
-result["a"] # equals to result[1]
-
-# apply - evaluating over the margins of an array (return vectors & matrices)
-x <- matrix(rnorm(200), 20, 10) # 1st margin of matrix - 20 rows, 2nd margin - 10 columns
-result <- apply(x, 2, sum) # apply func for each column (as 2nd margin of x) and get a vector
-result <- apply(x, 1, sum) # for each row
-
-rowMeans(x) # optimezed (more fast) functions for matrices
-rowSums(x)
-colMeans(x)
-colSums(x)
-
-x <- matrix(rnorm(200), 20, 10)
-apply(x, 1, quantile, probs = c(0.25, 0.75)) # apply func for each row and get 2-rows (25%, 75% percentiles) matrix with 20 cols 
-
-apply(x[,1:4], 2, mean) # evaluate func for each 1-4 first columns of x
-
-x <- array(rnorm((2*2)*10), c(2, 2, 10)) # get 3-dimensioan array (as 10 matrices 2x2)
-apply(x, c(1,2), mean) # apply func crossing 1st and 2nd margins (for 3rd dimension)  
-
-rowMeans(x, dims = 2) # optimezed (more fast)
-
-# mapply - multivariate version of lapply (for multiple input lists/vectors arguments)
-mapply(rnorm, 1:5, 1:5, 2) # evaluate func 5 times with 1 by 1 values of arguments' vectors (last arg's value is fixed)
-
-# tapply - apply a function over subsets of a vector (considering factor levels from another vector)
-x <- c(rnorm(10), rnorm(10), rnorm(10))
-f <- gl(3, 1, 3*10, labels = c("M","F","NA"))
-tapply(x, f, mean) # equals to sapply(split(x, f), mean)
-
-
-## Spliting vector/data frame considering factor levels
-# 1 factor
-x <- c(rnorm(10), rnorm(10), rnorm(10))
-f <- gl(3, 1, 3*10, labels = c("M","F","NA"))
-result <- split(x, f) # get list of vectors
-result$M
-
-sapply(split(x, f), mean)
-
-s <- split(DF, DF$factorcol) # split data frame considering Month value (for example)
-lapply(s, function(m) colMeans(m[, c("Ozone", "Solar.R", "Wind")]))
-sapply(s, function(m) colMeans(m[, c("Ozone", "Solar.R", "Wind")], na.rm = TRUE)) # simplified result table
-
-# 2 and more factors
-x <- rnorm(10)
-f1 <- gl(2, 5)
-f2 <- gl(5, 2)
-interaction(f1, f2) # combinate all values
-
-result <- split(x, list(f1, f2))
-result <- split(x, list(f1, f2), drop = TRUE) # drop objects for empty factor levels
-str(result) # show detailed objects' info
-
-
-
 ### INPUT/OUTPUT DATA INTERFACES
 readLines() # text files
 source("file.R")  # run script/load environment/functions - inverse of dump
@@ -580,9 +733,9 @@ close(con)
 
 DF <- read.table("./data/file.csv", sep = ",", header = TRUE, quote="") # default separator = space
 DF <- read.table(textConnection(gsub("-", "\t", readLines(url))), header = TRUE, skip = 2) # change '-' to white space & skip first strings
-head(DF) # 1st textstring
+head(DF) # 1st 6 text strings
 
-DF <- read.csv("file.csv", header = TRUE) # default separator = comma: ","
+DF <- read.csv("file.csv", header = TRUE) # default separator = comma: "," -- download.file() at first!
 DF <- read.csv2() # default separator = semicolon: ";"
 
 library(xlsx)
