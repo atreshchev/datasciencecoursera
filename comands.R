@@ -72,9 +72,6 @@ xt <- xtabs(Freq ~ Male + Admit, data = DF) # get counts (variable?) for differe
 
 xt <- (breaks ~ ., data = DF) # get counts by combinations of different values all ('.') variables (> 2dim)
 ftable(xt) # print flat table (as 2dim view)
- 
-paste("Hello", "World!", sep = " ") # get concatinated string
-sprintf("%03d", ID) # specific formatting: adding zeros up to 3- symbols number
 
 object.size(x) # get data object size in bytes
 print(object.size(x), units = "Mb") # size in Mb
@@ -590,10 +587,20 @@ ddply(DF, .(f), summarize, sum = ave(x, FUN = sum)) # using ave() if needs to du
 d <- as.Date("1970-01-11")
 unclass(x) # the number of days after 1970-01-01!
 
-d <- Sys.Date()
-d # date as string (POSIXct format)
+d <- date() # example: "Sun Oct  2 23:31:01 2016" - get character variable
 
-t <- Sys.time()
+d <- Sys.Date() # example: "2016-10-02"
+d # date as string (POSIXct format)
+format(d, "%d.%m.%y") # example: "02.10.16" (%a - abbr. weekday, %A - unabbr. weekday, %b - abbr. month, $B - unabbr. month, %Y - 4-digit year)
+
+dates <- as.Date(c("1янв2000", "16фев1990", "30июл1960"), "%d%b%Y")
+as.numeric(dates[1] - dates[2]) # get numeric of 'difftime' variable (dont forget units!)
+
+weekdays(dates)
+months(dates)
+julian(dates) # get difference by 'origin' date 1970-01-01 (as attribute)
+
+t <- Sys.time() # example: "2016-10-02 23:31:13 MSK"
 t # time as string (POSIXct format)
 unclass(t) # seconds after 1970-01-01!
 
@@ -606,11 +613,27 @@ t1$year
 Sys.getlocale(category = "LC_ALL")
 Sys.setlocale("LC_TIME", "en_US.UTF-8") # for correct full day/month names parsing
 timestring <- c("January 10, 2012 10:40", "December 9, 2011 9:10")
-t <- strptime(timestring, "%B %d, %Y %H:%M")
-t
+t2 <- strptime(timestring, "%B %d, %Y %H:%M")
+t2
 Sys.setlocale("LC_TIME", "ru_RU.UTF-8")
 
-t_gap <- as.POSIXct(Sys.time()) - as.POSIXct(t2) # get time difference in maximal difference time units -- equals as using as.POSIXlt()
+t_gap <- as.POSIXct(Sys.time()) - as.POSIXct(t) # get time difference in maximal difference time units -- equals as using as.POSIXlt()
+t_gap # example: Time difference of 0.01375794 secs - as 'difftime' variable
+attributes(t_gap)$units # as secs, mins, hours, days, ...
+as.numeric(t_gap)
+
+library(lubridate)
+ymd("20160130") # get date object considering any splitting symbols -- see many more combinations! of func names
+mdy("08/04/2013")
+dmy("02-12-2001")
+ymd_hms("2011-08-03 10:15:03")
+ymd_hms("2011-08-03 10:15:03", tz = "Pacific/Auckland") # use specified timezone
+Sys.timezone()
+
+x <- dmy("05-12-2001")
+wday(x) # get numeric value of weekday (by order: Sun < Mon < Tues < Wed < Thurs < Fri < Sat) -- see many more func names
+wday(x, label = TRUE)
+wday(x) <- 5 # set weekday
 
 
 ## Control Structures
@@ -859,6 +882,55 @@ x <- "aaa"
 y <- data.frame(a = 1, b = "a")
 dump(c("x", "y"), file = "vars.R") > rm(x, y)
 source("vars.R")
+
+
+## Text Processing
+tolower(c("Hello", "World!")) # get character values in lower register
+toupper(c("Hello", "World!"))
+
+splittedList <- strsplit("Hello.World.!", "\\.") # get the list of vectors of splitted words (by specified symbol '.')
+
+sub("_", "", "aaa_bbb_ccc") # single! replacement
+data <- gsub("-", " ", "aaa bbb ccc ddd eee-fff") # multiple! replacement '-' to white space (" " or "\t" for read.csv)
+con <- textConnection(data, open = "r", encoding = c("", "bytes", "UTF-8")) # open input/output text connection
+
+textvect <- c("aaa", "bbb", "Who is theeree? bbb")
+grep("bbb", textvect) # search string in character vector's elements and get their (elements') indexes
+grep("bbb", textvect, value = TRUE) # get the vector of elements only that matched!
+grepl("bbb", textvect) # get match/mismatch as TRUE/FALSE for every element of vector
+table(grepl("bbb", textvect))
+
+newtextvect <- textvect[!grepl("bbb", textvect)] # filter textvector by string entry
+
+library(stringr)
+nchar("Hello World!") # get count of characters
+
+substr("Hello World!", 1, 5) # extract symbols from start = 1 to stop = 5
+
+paste("Hello", "World!") # get concatinated string -- default separator = " "!
+paste("Hello", "World!", sep = "_")
+paste0("Hello", "World!") # no separator!
+
+str_trim("Hello      ") # delete last! space symbols
+
+sprintf("%03d", ID) # specific formatting: adding zeros up to 3-symbols number
+
+## Regular Expressions -- useful in sub/gsub/grep/grepl
+# ^ - represent the start of a line
+# $ - represent the end of a line
+# [Bb][Uu][Ss][Hh] - is the set of characters we accept
+# ^[0-9][a-zA-Z]
+# [^?.]$ - use "^" to not accept symbols, "?" - one symbol, "." - any punctuation symbol???)
+# ^$ - for metacharacter "" catching???
+# flood|fire|coldfire - use "|" as "or"
+# ^[Gg]ood|[Bb]ad - to catch "Good" at the beginning of the line and catch "Bad" in any position of the line!
+# ^([Gg]ood|[Bb]ad) - to catch "Good"/"Bad" at the beginning of the line
+# [Gg]eorge( [Ww]\.)? [Bb]ush - "()?" as optional condition ("\." - to catch "." symbol)
+# (.*) - "*" as repeat any times ("." - any character) to cath any text in ( ) - it catchs the longest matched variant
+# (.*?) - to catch the smaller variant
+# [0-9]+ - "+" as at least one symbol
+# Bush( +[^ ]+ +){1,5} debate - {1,5} as from 1 to 5 times ({5} as exactly 5 times, {5,} as at least 5 times)
+#  +([a-zA-Z]+) +\1 + - '\1' as one repeat of previous expression (at this case is to catch repeated words)
 
 
 ### PROFILING

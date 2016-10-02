@@ -26,7 +26,7 @@ data <- readJPEG("./data/jeff.jpg", native = TRUE) # if TRUE then the result is 
 quantile(data, c(0.3, 0.8))
 
 
-## 3. Load the Gross Domestic Product data for the 190 ranked countries in this data set.
+## 3. Load the Gross Domestic Product data for the 190 ranked countries.
 # Load the educational data from this data set.
 # Match the data based on the country shortcode. How many of the IDs match? 
 # Sort the data frame in descending order by GDP rank (so United States is last). 
