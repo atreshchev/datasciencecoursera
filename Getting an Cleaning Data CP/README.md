@@ -23,9 +23,9 @@ The result of the function is a list that contains:
 * `DF` - common data set (all measurements' features included) referred to subjects and activities
 * `mean_std_DF` - tidy data set (only mean & std measurements' features included)
 * `subjects_avg_mean_std_DF` - aggregated by subjects and activities tidy data set
-and also 2 files **mean_std_DF.csv** & **subjects_avg_mean_std_DF.csv** containing `mean_std_DF` & `subjects_avg_mean_std_DF` data sets.
+and also 2 files **mean_std_DF.txt** & **subjects_avg_mean_std_DF.txt** containing `mean_std_DF` & `subjects_avg_mean_std_DF` data sets.
 
-You can use results as usual working with any list objects and .csv files.
+You can use results as usual working with any list objects and .txt files.
 
 > Good luck! <br />
 > **AT**

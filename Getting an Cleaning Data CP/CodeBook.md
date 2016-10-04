@@ -35,5 +35,5 @@ Common transformations you should know: <br />
 3. Parsing raw data (chr strings) of measurements' by each feature and save as common numeric values data set <br />
 4. Extracting only the measurements on the mean and standard deviation of the data set <br />
 5. Extracting the data set with the average of each variable for each activity and each subject <br />
-6. Writing output tidy data sets' .csv files
+6. Writing output tidy data sets' .txt files
 

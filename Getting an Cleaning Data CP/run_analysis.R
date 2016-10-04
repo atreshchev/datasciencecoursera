@@ -36,8 +36,7 @@ cleaning_data <- function(data_path) {
   colnames(subjects_avg_mean_std_DF) <- c("Subject", "Activity", mean_std_features_names)
   
 ## 6. Write output tidy data sets' files
-  write.csv(mean_std_DF, "mean_std_DF.csv")
-  write.csv(subjects_avg_mean_std_DF, "subjects_avg_mean_std_DF.csv")
-  
+  write.table(mean_std_DF, "mean_std_DF.txt", row.name=FALSE)
+  write.table(subjects_avg_mean_std_DF, "subjects_avg_mean_std_DF.txt", row.name=FALSE) 
   list(DF, mean_std_DF, subjects_avg_mean_std_DF)
 }
