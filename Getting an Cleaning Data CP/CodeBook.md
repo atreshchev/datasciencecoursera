@@ -1,5 +1,4 @@
-## Human Activity Recognition Using Smartphones - Getting and Cleaning Data Project
-# Understanding of code
+## Human Activity Recognition Using Smartphones - Getting and Cleaning Data Project / Understanding of code
 
 This project contains only one R code script: **run_analysis.R**
 
@@ -15,11 +14,11 @@ http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartpho
 
 ## Variable
 
-The R code describes 'cleaning_data()' function which convert raw data of UCI HAR measurements to tidy data sets and save it as .csv files.
-Yo should use the function with argument 'data_path' adressed UCI HAR Project's data set directory which is presetted as '"data/UCI HAR Dataset/"'.
+The R code describes `cleaning_data()`' function which convert raw data of UCI HAR measurements to tidy data sets and save it as .csv files.
+Yo should use the function with argument `data_path` adressed UCI HAR Project's data set directory which is presetted as `"data/UCI HAR Dataset/"`.
 
 Common variables you should know:
-* **raw_data**, **activity**, **subjects** - united vectors (train + test = 10299 obs.) of measurements' features, activity codes and subjects values
+* `**raw_data**`, **activity**, **subjects** - united vectors (train + test = 10299 obs.) of measurements' features, activity codes and subjects values
 * **activity_labels**, **features_names** - input descriptive activity labels (6 values in matrix) and features' of measuerements names (561 values in vector)
 * **features** - the temporary list of features' of measuerements values (10299 x 561 numeric values)
 * **DF** - the common data set (data frame) of subjects (the 1st column), activity labels (the 2nd column) and values of all features of measuerements (3:563 columns) 
