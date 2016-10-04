@@ -1,9 +1,9 @@
-## Human Activity Recognition Using Smartphones - Getting and Cleaning Data Project / Understanding of code
+## Human Activity Recognition Using Smartphones - Getting and Cleaning Data Project <br />/ Understanding of code ##
 
 This project contains only one R code script: **run_analysis.R**
 
 
-## Data
+### Data ###
 
 For running this code you should get UCI HAR Dataset:
 https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
@@ -12,7 +12,7 @@ Full description of UCI HAR Project is obtained:
 http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
 
 
-## Variable
+### Variables ###
 
 The R code describes `cleaning_data()` function which convert raw data of UCI HAR measurements to tidy data sets and save it as .csv files.
 Yo should use the function with argument `data_path` addressed UCI HAR Project's data set directory which is presetted as `"data/UCI HAR Dataset/"`.
@@ -27,13 +27,13 @@ Common variables you should know:
 * `subjects_avg_mean_std_DF` - the aggregated by subjects and activities (30 x 6 rows) tidy data set (data frame) of subjects (the 1st column), activity labels (the 2nd column) and average for each subject/activity values of features based on the mean and standard deviation values
 
 
-## Transformations
+### Transformations ###
 
 Common transformations you should know:
-1. Reading and getting united rows of input data (train & test measurements' raw data, activity codes, subjects)
-2. Reading activity labels & features of measurements' names
-3. Parsing raw data (chr strings) of measurements' by each feature and save as common numeric values data set
-4. Extracting only the measurements on the mean and standard deviation of the data set
-5. Extracting the data set with the average of each variable for each activity and each subject
+1. Reading and getting united rows of input data (train & test measurements' raw data, activity codes, subjects) <br />
+2. Reading activity labels & features of measurements' names <br />
+3. Parsing raw data (chr strings) of measurements' by each feature and save as common numeric values data set <br />
+4. Extracting only the measurements on the mean and standard deviation of the data set <br />
+5. Extracting the data set with the average of each variable for each activity and each subject <br />
 6. Writing output tidy data sets' .csv files
 
