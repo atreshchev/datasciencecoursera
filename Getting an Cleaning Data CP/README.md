@@ -1,4 +1,4 @@
-## Human Activity Recognition Using Smartphones - Getting and Cleaning Data Project <br />/ How it works & how to reproduce ##
+## Human Activity Recognition Using Smartphones - Getting and Cleaning Data Project / How it works & how to reproduce ##
 
 This project contains only one R code script: **run_analysis.R**
 

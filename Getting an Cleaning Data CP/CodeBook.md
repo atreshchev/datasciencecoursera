@@ -1,4 +1,4 @@
-## Human Activity Recognition Using Smartphones - Getting and Cleaning Data Project <br />/ Understanding of code ##
+## Human Activity Recognition Using Smartphones - Getting and Cleaning Data Project / Understanding of code ##
 
 This project contains only one R code script: **run_analysis.R**
 
@@ -29,7 +29,7 @@ Common variables you should know:
 
 ### Transformations ###
 
-Common transformations you should know:
+Common transformations you should know: <br />
 1. Reading and getting united rows of input data (train & test measurements' raw data, activity codes, subjects) <br />
 2. Reading activity labels & features of measurements' names <br />
 3. Parsing raw data (chr strings) of measurements' by each feature and save as common numeric values data set <br />
