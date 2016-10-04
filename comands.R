@@ -19,6 +19,9 @@ args(anyfunc) # show function's arguments
 str(anyfunc) # show function's arguments too
 search() # show loaded packages (environments)
 
+object.size(x) # get data object size in bytes
+print(object.size(x), units = "Mb") # size in Mb
+
 library(pack) # load package
 detach("package:pack") # unload package
 
@@ -72,9 +75,6 @@ xt <- xtabs(Freq ~ Male + Admit, data = DF) # get counts (variable?) for differe
 
 xt <- (breaks ~ ., data = DF) # get counts by combinations of different values all ('.') variables (> 2dim)
 ftable(xt) # print flat table (as 2dim view)
-
-object.size(x) # get data object size in bytes
-print(object.size(x), units = "Mb") # size in Mb
 
 x <- 5 # numeric
 x <- 5L # integer
@@ -289,7 +289,8 @@ summarize(group_by(DF, aggregatecol)) # agregate (by 'group_by') and show differ
 summarize(group_by(DF, aggregatecol), min(colX), max(colX), mean(colX)) # agregate (by 'group_by') and evaluate expressions
 
 tempDF <- mutate(DF, year = as.POSIXlt(datecol)$year + 1900)
-summarize(group_by(tempDF, year), min(colX), max(colX), spec_colname = mean(colX)) # agregate data by year value extracted from 'datacol' variable
+DF <- summarize(group_by(tempDF, year), min(colX), max(colX), spec_colname = mean(colX)) # agregate data by year value extracted from 'datacol' variable
+DF <- summarize_each(group_by(tempDF, aggrCol1, aggrCol2), funs(mean)) # summarize function for each columns except of columns aggregated by
 # 'pipeline' instructions provided by 'dplyr'
 DF %>% mutate(month = as.POSIXlt(datecol)$mon + 1) %>% group_by(month) %>% summarize(col1 = min(colX), col2 = max(col2), col3 = mean(colX)) # get from DF 'month' & 'col1', 'col2', 'col3' (by aggregation) as data frame
 
@@ -300,7 +301,7 @@ cylData <- dcast(moltenDF, cyl ~ variable, mean) # evaluate mean values of varia
 acast() # use for casting as multi-dimensional arrays
 
 library(tidyr)
-# evolution of 'reshape2' and using 'dplyr' pipelines -- see swirl of DS_C3_W3 (lesson 3)!
+# ... evolution of 'reshape2' and using 'dplyr' pipelines -- see swirl of DS_C3_W3 (lesson 3)!
 
 data.matrix() # convert data frame to matrix
 
@@ -411,8 +412,9 @@ x[x[, 2] == 4 | x[, 3] == 9, ] # OR
 
 ## subsetting 2
 x <- list(foo = 1:4, bar = 0.6)
-x[1] # get the list-element!!! with element name
+x[1] # get the 1st of the list element = sublist!!! with element name
 x[[1]] # get the vector
+x[[1]][7000] # get the 7000th value of vector
 
 x["bar"] # get the list-element!!! with element name ('computed index')
 x$bar # simple object
@@ -489,7 +491,7 @@ splitted <- split(x, f) # get list of vectors (for $M, $F, $NA elements)
 splitted$M
 
 sapply(split(x, f), mean) # evaluate expression for each element (vector) of input list which is created by split()
-unlist(lapply(split(x, f), mean)) # the same result (converted from list elements to vector)
+unlist(lapply(split(x, f), mean)) # the same result (convert all list elements to one vector)
 
 s <- split(DF, DF$factorcol) # split data frame considering Month value (for example)
 lapply(s, function(m) colMeans(m[, c("Ozone", "Solar.R", "Wind")]))
@@ -579,8 +581,9 @@ unlist(lapply(split(x, f), mean))
 
 library(plyr)
 ddply(DF, .(f), summarize, sum = sum(x)) # another way to agregate and evaluate expression (f, x - factor and val columns of DF)
-
 ddply(DF, .(f), summarize, sum = ave(x, FUN = sum)) # using ave() if needs to duplicate sum result for each element of every factor group
+
+DF <- as.data.frame(do.call("rbind", ListOfChrVect))
 
 
 ## Dates & Times
@@ -616,6 +619,7 @@ timestring <- c("January 10, 2012 10:40", "December 9, 2011 9:10")
 t2 <- strptime(timestring, "%B %d, %Y %H:%M")
 t2
 Sys.setlocale("LC_TIME", "ru_RU.UTF-8")
+# Sys.setlocale(category = "LC_MESSAGES", "en_US.UTF-8")
 
 t_gap <- as.POSIXct(Sys.time()) - as.POSIXct(t) # get time difference in maximal difference time units -- equals as using as.POSIXlt()
 t_gap # example: Time difference of 0.01375794 secs - as 'difftime' variable
@@ -931,7 +935,7 @@ sprintf("%03d", ID) # specific formatting: adding zeros up to 3-symbols number
 # [0-9]+ - "+" as at least one symbol
 # Bush( +[^ ]+ +){1,5} debate - {1,5} as from 1 to 5 times ({5} as exactly 5 times, {5,} as at least 5 times)
 #  +([a-zA-Z]+) +\1 + - '\1' as one repeat of previous expression (at this case is to catch repeated words)
-
+# [^^]( )+ - greedy spaces but ignore one in the beginning of a string
 
 ### PROFILING
 # return user.self (charged time resource to all CPUs for expression/'пользователь') &

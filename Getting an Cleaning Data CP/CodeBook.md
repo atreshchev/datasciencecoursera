@@ -1,6 +1,5 @@
 ---
-title: "Human Activity Recognition Using Smartphones - Getting and Cleaning Data"
-author: "Alexander Treshchev"
+title: "Untitled"
 ---
 
 ```{r setup, include=FALSE}
