@@ -294,6 +294,8 @@ DF <- summarize_each(group_by(tempDF, aggrCol1, aggrCol2), funs(mean)) # summari
 # 'pipeline' instructions provided by 'dplyr'
 DF %>% mutate(month = as.POSIXlt(datecol)$mon + 1) %>% group_by(month) %>% summarize(col1 = min(colX), col2 = max(col2), col3 = mean(colX)) # get from DF 'month' & 'col1', 'col2', 'col3' (by aggregation) as data frame
 
+mydata.averages <- aggregate(mydata[,4:89],list(mydata$Subject_ID,mydata$Activity), mean) # yet another way to aggregate
+
 library(reshape2)
 moltenDF <- melt(DF, id = c("carname", "gear", "cyl"), measure.vars = c("mpg", "hp")) # get DF with rows where 'carname - gear - cyl' are duplicated & 'variable - value' are different ("mpg" in top rows, "hp" in lower)
 cylData <- dcast(moltenDF, cyl ~ variable) # agregate molten data frame and count! of different values of varibles ("mpg" & "hp") for dufferent values of "cyl"
@@ -358,6 +360,8 @@ setkey(DT1, x) # for speeding up join operations
 setkey(DT2, x)
 merge(DT1, DT2) # join tables without NA values
 merge(DT1, DT2, all = TRUE) # join tables with NA values
+
+merge(activity_nums, activity_labels, by.x = 1, by.y="V1",sort = FALSE) # filling chr labels (activity_labels$V2) for any mathing activity_labels$V2 <-> activity_nums[1] number
 
 
 # Fast reading
@@ -713,6 +717,8 @@ load() # saved workspace
 unserialize() # single R objects from binary
 gzfile() # unarchive file
 bzfile()
+
+unzip(zipfile="./data/Dataset.zip", exdir="./data")
 
 download.file("https://site.com/rows.csv?accessType=DOWNLOAD", destfile = "./data/file.csv", method = "curl")
 downloadDate <- date() # current time & date
