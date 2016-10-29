@@ -1,5 +1,5 @@
-## R commands here.
-## to submit changes via Rstudio use -> Commit -> Push
+### R commands here.
+### All course's materials here: https://github.com/DataScienceSpecialization/courses
 
 getwd() # my directory
 dir()   # files in directory
@@ -47,9 +47,10 @@ sqrt()
 abs()
 max()
 mean()
+median()
 
-# cos()  sin()  exp()
-# log() log2()  log10()
+# cos()   sin()  exp()
+# log()  log2()  log10()
 
 ceiling(3.475) # round to 4
 floor(3.475) # round to 3
@@ -76,10 +77,11 @@ xt <- xtabs(Freq ~ Male + Admit, data = DF) # get counts (variable?) for differe
 xt <- (breaks ~ ., data = DF) # get counts by combinations of different values all ('.') variables (> 2dim)
 ftable(xt) # print flat table (as 2dim view)
 
-x <- 5 # numeric
+x <- 5 # numeric - DWORD (8 bytes)
 x <- 5L # integer
 c(1, 2) # numeric
-c(4, TRUE) #numeric
+c(4, TRUE, FALSE) #numeric
+c(4, T, F) # the same - T = TRUE, F = FALSE
 x <- 1:6 # integer
 class(x)
 str(x) # more detailed var info
@@ -105,15 +107,19 @@ arrange(DF, col1, col2) # multiple order
 
 x <- c(TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, TRUE)
 which(x) # get TRUE elements' indexes!
+x <- c(1, 2, 2, 3, 4, 4, 5)
+which(x == 3) # get x elements' indexes for those the result of expression is TRUE
 
 x <- c(1, 2, 2, 3, 3, 3, 3, 4, 5)
-unique(x) # get only unique values
+unique(x) # get only unique values' vector
 
 x <- c(1, 2, 2, 3, 3, 3, 3, 4, 5)
 y <- c(4, 5, 6, 7, 8, 8, 9, 9, 0)
 intersect(x, y)
 
 x <- rep(1, 10) # get vector with 1 repeated 10 times
+x <- rep(c(0, 1), each = 5) # get 0000011111 vector
+x <- rep(c(0, 1), 5) # get 0101010101 vector
 
 x <- vector("numeric", length = 10)
 x <- c("a", "b", "c") # T, F == TRUE=1, FALSE=0; 5+4i == complex number...
@@ -133,11 +139,13 @@ x <- ifelse(y < 5, TRUE, FALSE) # get vector of epression's results (user specif
 table(DF$zipWrong, DF$zipCode < 0) # get count of values for variables' combinations (with given condition for one variable)
 
 library(Hmisc)
-zipGroups <- cut2(DF$zipCode, g = 4) # some different wat -- get factor variable with values which represent 4 intervals [ , ), [ , ]
+zipGroups <- cut2(DF$zipCode, g = 4) # some different way -- get factor variable with values which represent 4 intervals [ , ), [ , ]
 table(zipGroups) 
 
 x <- gl(3, 10) # get vector of factor levels - 3 levels each with 10 replications (ordered)
 x <- gl(3, 1, 3*10, labels = c("M", "F", "NA")) # 3 levels with 1 replication repeating each for 10 times (cycled)
+y[x == "M"] # get y only corresponding to x = "M" factor
+
 
 x <- sapply(list(a = 1:10, b = 55:88, c = 99:20), mean)
 str(x)
@@ -165,6 +173,10 @@ x <- 1:3
 y <- 4:6
 m <- cbind(x, y)
 m <- rbind(x, y)
+
+m1 <- matrix(c(1,2,2,0,4,3), nrow = 2)
+m2 <- matrix(c(2,1,1,5,3,1), nrow = 3)
+m1 %*% m2 # get matrix multiplication
 
 
 ## Randomization
@@ -248,8 +260,11 @@ DF <- data.frame(a = 1:4, b = c(T, F, T, F), c = 5:8, d = 4:1)
 dim(DF)
 nrow(DF)
 ncol(DF)
+names(DF) # get colnames of DF
+colnames(DF) # get colnames of DF too
 rownames(DF) <- rownames(someDF) # copy rownames to DF
-colnames(DF)
+
+names(DF) <- make.names(names(DF)) # get correct character names (convert space symbols to '.')
 
 DF$a # get elements of one column
 DF[, c(1,3:4)] # get elements of columns with specific numbers
@@ -264,7 +279,11 @@ j <- match("colnameZ", names(DF))
 DF[, i:j]
 DF[, -(i:j)] # get all columns except of specified columns
 
-DF <- data.frame(col1 = character(), col2 = character())
+DF <- data.frame(col1 = character(), col2 = character()) # init DF
+DF <- data.frame(state.x77, valRegion = state.region) # get DF based on some other arrays (DF)
+
+DF <- transform(DF, valvect1 = as.Date(valvect1)) # replace values of existing column (change the type of values) 
+DF <- transform(DF, valvect2 = factor(valvect2))
 
 DF$newcol <- rnorm(5) # adding new column
 DF <- cbind(DT, rnorm(5)) # adding new column to the right
@@ -333,6 +352,7 @@ DT[, .(a, c)] # get elements of named columns too - where .() is alias of list()
 DT[, list(min(x), sum(z), max(y))] # get values matched to 'expression'!
 DT[, table(y)] # get count! of y elements by different values
 
+subDF <- subset(DF, col1name == "col1val") # filter by col1 value
 subset(DF, col1name == "col1val")$col2 # filter by col1 value to get col2
 
 set.seed(123) # init random number generator with some state
@@ -361,7 +381,7 @@ setkey(DT2, x)
 merge(DT1, DT2) # join tables without NA values
 merge(DT1, DT2, all = TRUE) # join tables with NA values
 
-merge(activity_nums, activity_labels, by.x = 1, by.y="V1",sort = FALSE) # filling chr labels (activity_labels$V2) for any mathing activity_labels$V2 <-> activity_nums[1] number
+merge(activity_nums, activity_labels, by.x = 1, by.y="V1", sort = FALSE) # filling chr labels (activity_labels$V2) for any mathing activity_labels$V2 <-> activity_nums[1] number
 
 
 # Fast reading
@@ -406,6 +426,12 @@ y[use] # subsetted vector!
 y <- c(TRUE, FALSE, FALSE, FALSE, TRUE, FALSE)
 use <- y == TRUE
 y[use]
+
+x <- c(-5, -2, -1, 0, 1, 2, 2, 5, NA, NA, 7)
+negative <- x < 0  # get TRUE/FALSE vector by expression
+x[negative] # get negative & NA values
+negative <- x < 0 & !is.na(x)
+x[negative]  # get only negative values
 
 x <- matrix(1:9, 3, 3)
 x[x[, 2] >= 5, ] # get rows with col2 >= 5
@@ -455,9 +481,10 @@ x$va # first symbols matching
 x[["va", exact = FALSE]] # first symbols matching
 
 
-## NA accounting & removing
+## NA accounting & removing & imputing
 sum(is.na(x)) # get count of NAs
 any(is.na(x)) # at least one NA (get TRUE/FALSE)
+mean(is.na(x)) # get the % of NA values in common volume of x
 
 colSums(is.na(DF)) # get result for each column
 all(colSums(is.na(DF) == 0))
@@ -473,6 +500,10 @@ y <- c("a", "b", NA, "c", NA, "d")
 good <- complete.cases(x, y) # there is no NA elements,ALSO: works with matrix name analyzing rows' data 
 y[good]
 
+library(impute) # to install: source("https://bioconductor.org/biocLite.R"); biocLite("impute")
+DM[sample(1:100, size = 40, replace = FALSE)] <- NA # generate 40 random indexes from 1 to 100 and write corresponding values of DM as NA
+DMrecovery <- impute.knn(DM)$data # imputing NA values using 'k' nearest neighbor averaging (by default k = 10)
+
 
 ## Vectors and Matrix operations
 x <- 1:4
@@ -486,13 +517,17 @@ x <- 1:6
 y <- 2:3
 x + y # get integer! vector by multiple - 3x (length(x)/length(y)) adding y to x with shifting y from left to right
 
+apply(DM, 2, which.max) # find for every column (that '2' is meaning) of DM the rows' indexes where max values are cantained
+apply(DM, 2, which.min) # find rows' indexes where min values are cantained
+
 
 ## Spliting vector/data frame considering factor levels
 # 1 factor
 x <- c(rnorm(10), rnorm(10), rnorm(10))
-f <- gl(3, 1, 3*10, labels = c("M","F","NA"))
-splitted <- split(x, f) # get list of vectors (for $M, $F, $NA elements)
+f <- gl(3, 1, 3*10, labels = c("M","F","NA")) # generate factor levels
+splitted <- split(x, f) # get list of vectors (as separated $M, $F, $NA objects)
 splitted$M
+sapply(splitted, length) # get length() result for each list's object (by factors M, F, NA)
 
 sapply(split(x, f), mean) # evaluate expression for each element (vector) of input list which is created by split()
 unlist(lapply(split(x, f), mean)) # the same result (convert all list elements to one vector)
@@ -587,6 +622,8 @@ library(plyr)
 ddply(DF, .(f), summarize, sum = sum(x)) # another way to agregate and evaluate expression (f, x - factor and val columns of DF)
 ddply(DF, .(f), summarize, sum = ave(x, FUN = sum)) # using ave() if needs to duplicate sum result for each element of every factor group
 
+ddply(DF, .(f1, f2), summarize, sum = sum(x)) # apply for combination of factors
+
 DF <- as.data.frame(do.call("rbind", ListOfChrVect))
 
 
@@ -602,6 +639,9 @@ format(d, "%d.%m.%y") # example: "02.10.16" (%a - abbr. weekday, %A - unabbr. we
 
 dates <- as.Date(c("1янв2000", "16фев1990", "30июл1960"), "%d%b%Y")
 as.numeric(dates[1] - dates[2]) # get numeric of 'difftime' variable (dont forget units!)
+
+diff <- difftime(date_last, date_first, units = "mins") # get time difference in specified units
+as.numeric(diff)
 
 weekdays(dates)
 months(dates)
@@ -711,7 +751,8 @@ for (i in 1:100) {
 
 ### INPUT/OUTPUT DATA INTERFACES
 readLines() # text files
-source("file.R")  # run script/load environment/functions - inverse of dump
+source("file.R") # run script/load environment/functions - inverse of dump
+myedit("file.R") # open the file in the editor frame
 dget() # code - inverse of doubt
 load() # saved workspace
 unserialize() # single R objects from binary
@@ -764,11 +805,13 @@ con <- file("file.txt", "rw")
 data <- read.csv(con)
 close(con)
 
-DF <- read.table("./data/file.csv", sep = ",", header = TRUE, quote="") # default separator = space
+DF <- read.table("./data/file.csv", sep = ",", header = TRUE, quote="", na = "?") # default separator = space
+DF <- read.table("./data/file.csv", sep = ",", header = TRUE, quote="", na.strings = "") # 'na.strings' equals to 'na' argument
+DF <- read.table("./data/file.csv", sep = ",", header = TRUE, quote="", na.strings = "", comment.char = "#")
 DF <- read.table(textConnection(gsub("-", "\t", readLines(url))), header = TRUE, skip = 2) # change '-' to white space & skip first strings
 head(DF) # 1st 6 text strings
 
-DF <- read.csv("file.csv", header = TRUE) # default separator = comma: "," -- download.file() at first!
+DF <- read.csv("file.csv", header = TRUE, colClasses = c("numeric", "character", "factor")) # default separator = comma: "," -- download.file() at first!
 DF <- read.csv2() # default separator = semicolon: ";"
 
 library(xlsx)
@@ -813,9 +856,11 @@ cat(myjson) # concatenate a lot of elements and print
 x <- read.table("datatable.txt", comment.char = "")
 
 # 2 - specifying classes of objects
-initial <- read.table("datatable.txt", nrows = 50)
+initial <- read.table("datatable.txt", nrows = 50) # read first rows to analyze data classes
 classes <- sapply(initial, class)
-x <- read.table("datatable.txt", colClasses = classes)
+x <- read.table("datatable.txt", colClasses = classes) # read all others rows applying specified classes
+x <- read.table("datatable.txt", colClasses = c("numeric", "character", "factor", "numeric"))
+
 
 ## MySQL
 library(RMySQL)
@@ -906,8 +951,10 @@ con <- textConnection(data, open = "r", encoding = c("", "bytes", "UTF-8")) # op
 
 textvect <- c("aaa", "bbb", "Who is theeree? bbb")
 grep("bbb", textvect) # search string in character vector's elements and get their (elements') indexes
+grep("bbb", DF$shortname)
 grep("bbb", textvect, value = TRUE) # get the vector of elements only that matched!
-grepl("bbb", textvect) # get match/mismatch as TRUE/FALSE for every element of vector
+
+grepl("bBb", textvect, ignore.case = TRUE) # get match/mismatch as TRUE/FALSE for every element of vector & turn off case sensitivity
 table(grepl("bbb", textvect))
 
 newtextvect <- textvect[!grepl("bbb", textvect)] # filter textvector by string entry

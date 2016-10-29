@@ -1,9 +1,12 @@
 # SWIRL
 library(swirl)
+packageVersion("swirl") # need to be 2.2.1 or later
 
 install_from_swirl("R Programming")
+install_from_swirl("Exploratory Data Analysis")
 
-swirl()
+swirl() # run SWIRL
+# name: Alexander
 
 bye() # bye() to exit and save your progress
 skip() # allows you to skip the current question.

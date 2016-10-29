@@ -1,3 +1,7 @@
+### To submit files' changes via RStudio use in right frame: Git --> Commit --> Push
+### To clone the project from Github 'Fork' it via website, then copy the repo's link &
+### use via RStudio: File --> New Project --> Version Control --> From Github (use repo's link)
+
 ### GitHub Troubleshoutings
 # xcrun: error: invalid active developer path (/Library/Developer/CommandLineTools), missing xcrun at: /Library/Developer/CommandLineTools/usr/bin/xcrun
 

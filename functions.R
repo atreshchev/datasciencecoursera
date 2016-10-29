@@ -1,4 +1,4 @@
-## Functions
+### R Functions here
 myfunc <- function(x) {
   y <- 55 + mean(x)
   y # functions does not edit global environment!
