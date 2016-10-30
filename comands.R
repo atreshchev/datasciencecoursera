@@ -1,5 +1,9 @@
 ### R commands here.
-### All course's materials here: https://github.com/DataScienceSpecialization/courses
+### All course's materials: https://github.com/DataScienceSpecialization/courses
+
+library(pack) # load package
+detach("package:pack") # unload package
+update.packages()
 
 getwd() # my directory
 dir()   # files in directory
@@ -21,9 +25,6 @@ search() # show loaded packages (environments)
 
 object.size(x) # get data object size in bytes
 print(object.size(x), units = "Mb") # size in Mb
-
-library(pack) # load package
-detach("package:pack") # unload package
 
 ## Files
 file.create("filename")

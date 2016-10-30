@@ -1,0 +1,87 @@
+---
+title: "Test R Morkdown"
+output: html_document
+---
+
+Including caching to optimize chunks' evaluating time ()
+```{r global_default_chunks_options, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+## Using knitr without GUI (and not evaluating the code below)
+```{r, eval = FALSE}
+library(knitr)
+knit2html("document.Rmd")
+browseURL("document.html")
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo = FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+x <- rnorm(10)
+x
+y <- rnorm(5)
+y
+```
+
+Evaluating the code but hiding the results
+```{r, results = "hide"}
+x + y
+```
+
+## Inline text computations
+```{r inline_text_computations, echo = FALSE}
+time <- format(Sys.time(), "%a %b %d %X %Y")
+rand <- rnorm(1)
+```
+
+The current time is: `r time`.
+Random number is: `r rand`.
+
+## Incorporating Graphics
+First let's get the data
+```{r simulatedata}
+x <- rnorm(100)
+y <- x + rnorm(100, sd = 0.5)
+```
+
+Here is a scatterplot of the data
+```{r drawdata, fig.height = 4, fig.width = 4}
+par(mar = c(5, 4, 4, 1), las = 1)
+plot(x, y, main = "Simulated data")
+```
+
+## Making HTML Tables with 'xtable' package
+```{r dataset}
+library(datasets)
+data("airquality")
+fit <- lm(Ozone ~ Wind + Temp + Solar.R, data = airquality)
+```
+
+Here is a table of regression coefficients
+```{r htmltable, results = "asis"}
+library(xtable)
+xt <- xtable(summary(fit))
+print(xt, type = "html")
+```
+
+
+

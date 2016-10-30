@@ -404,8 +404,6 @@ plot1 <-
 ### Examples: https://plot.ly/r
 # signup(username, email, save = TRUE) # to register as new user and get the API key
 library(plotly)
-Sys.setenv("plotly_username" = "atreshchev")
-Sys.setenv("plotly_api_key" = "wu6bv19l9k")
 
 ## Plot (basic)
 data <- data.frame(x = c(1:100), random_y = rnorm(100, mean = 0))
@@ -414,6 +412,7 @@ p <- plot_ly(data, x = ~x, y = ~random_y, type = 'scatter', mode = 'lines')
 p
 
 plotly_IMAGE(p, width = 600, height = 480, format = "png", scale = 1, "myplot2.png")
+plotly_POST(p, filename = "test_graph")
 
 ## Plot (basic multiple graphs in one plot)
 data <- data.frame(x = c(1:100), trace_0 = rnorm(100, mean = 5), trace_1 = rnorm(100, mean = 0), 
@@ -475,4 +474,10 @@ plot_ly(z = ~volcano, type = "surface")
 ## Pie charts
 ## Dashboards
 ## ...
+
+
+### Shiny (Web-application Framework: maps, simulation forms & others)
+# Russia Election 2016 results map
+shiny::runGitHub("e-chankov/elections_2016_districts")
+
 

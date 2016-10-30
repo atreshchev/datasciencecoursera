@@ -1,6 +1,10 @@
 ### To submit files' changes via RStudio use in right frame: Git --> Commit --> Push
 ### To clone the project from Github 'Fork' it via website, then copy the repo's link &
 ### use via RStudio: File --> New Project --> Version Control --> From Github (use repo's link)
+###
+### BOOK:  https://git-scm.com/book/ru/v2
+### PUB:   https://habrahabr.ru/post/313890/
+### LEARN: http://learngitbranching.js.org/?demo
 
 ### GitHub Troubleshoutings
 # xcrun: error: invalid active developer path (/Library/Developer/CommandLineTools), missing xcrun at: /Library/Developer/CommandLineTools/usr/bin/xcrun
@@ -97,3 +101,14 @@ chmod -R g+ws *
 chgrp -R group *
 git config core.sharedRepository group
 git repack master
+
+
+## Delete large file (when error with commiting 100+ MB)
+git filter-branch --index-filter 'git rm -r --cached --ignore-unmatch data/household_power_consumption.txt' HEAD
+
+# Turn on large files versioning
+git lfs install
+git lfs track "*.psd"   # specify supported large files type
+
+
+
