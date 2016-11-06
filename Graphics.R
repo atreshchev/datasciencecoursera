@@ -94,15 +94,23 @@ plot(DF$vectval, type = "n") # draw empty plot
 plot(DF$vectval, type = "l", xaxt = "n") # don't draw x-axes
 
 plot(DF$date, DF$val, type = "l", axes = FALSE) # don't draw any axes
-  axis(side = 2, at = 0:8) # set left axis parameters 
+  axis(side = 2, at = 0:8, cex.axis = .7) # set left axis parameters (with small text font because of 'cex.axis' = .7)
   axis.POSIXct(side = 1, at = seq(as.POSIXlt(min(dmy(data$Date))),
-                                  as.POSIXlt(max(dmy(data$Date))), by = "days"), format="%a") # set below axis parameters for DATE
+                                  as.POSIXlt(max(dmy(data$Date))), by = "days"), format = "%a") # set below axis parameters for DATE
   box() # draw plot frame border
 
+  axis.Date(side = 1, at = seq(min(DF$date), max(DF$date), by = "days"), format = "%a") # alternative way
+
+  axis(1, at = seq(0, 17568-1, 288), labels = format(unique(DF$date), "%m/%d\n (%a)")) # draw Date-values for specified points
+  
   text(x + 0.05, y + 0.05, labels = as.character(1:12)) # draw labels for each point (as numbers in this example)
 
 plot(DF$year, DF$val, type = "b", xaxt = "n") # draw without x-axis labels (because of xaxt="n")
   axis(side = 1, at = DF$year, labels = PM$year) # draw only specified labels in specified ('at') points
+
+DM <- matrix(runif(40, 1, 20), ncol = 4) # make data with 4 variables (columns)
+matplot(DM, type = "l", pch = 1, col = 1:4) # draw each variable (clolumn) as separate line
+  legend("topleft", legend = c("one", "two", "three", "four"), pch = 1, col = 1:4)
 
 
 ## Scatterplot (диаграмма рессеивания)
@@ -273,7 +281,7 @@ DF <- data.frame(x = rnorm(75),
                  y = rbinom(75, 1000, 0.5),
                  f = factor(rep(0:2, each = 25), labels = c("Group 1", "Group 2", "Group 3")))
 xyplot(y ~ x | f, DF) # draw plots by factor 'f' value from left to right & from the bottom to the top (as matrix 2 x 2 - by default)
-xyplot(y ~ x | f, DF, layout = c(3, 1)) #  draw plots by factor 'f' from the left to the right (in 1 column)
+xyplot(y ~ x | f, DF, layout = c(3, 1)) #  draw plots by factor 'f' from the left to the right (in 1 row)
 xyplot(y ~ x | f, DF, layout = c(1, 3)) #  draw plots by factor 'f' from the top to the bottom (in 1 column)
 
 # Custom panel function
@@ -286,6 +294,16 @@ xyplot(y ~ x | f, DF, panel =  function(x, y, ...) {
   panel.xyplot(x, y, ...)
   panel.lmline(x,y, col = 2) # add a regression line on every plot
 })
+
+xyplot(meansteps ~ interval | wday, DFwday, type = "l", 
+       xlab = "Intervals", ylab = "Average Number of Steps",
+       layout = c(1, 7), as.table = TRUE, strip = FALSE,    # draw top-to-bottom panels (as.table = TRUE) & without panels' labels (strip = FALSE)
+       panel = function(x = interval, y = meansteps, ...) {
+         panel.xyplot(x, y,...)
+         panel.text(0, 0.85*max(DFwday$meansteps), 
+                    labels = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday",
+                               "Friday", "Saturday")[which.packet()])
+       })
 
 
 ## Boxplot (диаграмма размахов/коробчатая)
@@ -348,6 +366,8 @@ qplot(log(x), data = DF, geom = "density", color = y) # draw many density graphi
 ggplot(DF, aes(x, y)) + geom_line() + ylim(-3, 3) # set y-axis visible values' diapason 
 ggplot(DF, aes(x, y)) + geom_line() + coord_cartesian(ylim = c(-3, 3)) # the same
 
+ggplot(DF, aes(Date, Visits)) + geom_line() + scale_x_date(format = "%b %d", major =  "1 day") # draw x-axis as Date values
+
 
 ## Scatterplot (диаграмма рассеивания)
 qplot(x, y, data = DF)
@@ -396,8 +416,6 @@ ggplot(DF, aes(x, y)) + geom_point() + facet_grid(. ~ z) +
                               label = c("66% Reduction: 1999-2008","34% Reduction: 1999-2008"), 
                               County = c("Baltimore","Los Angeles")),
             aes(x, y , label = label), inherit.aes = FALSE) # draw individual text comments on two facets
-
-plot1 <- 
 
 
 ### Plot_ly Interactive System

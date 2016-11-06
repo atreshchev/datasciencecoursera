@@ -1,0 +1,179 @@
+---
+title: "DS_C5_W2_assign: Markdown Practice"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+#source(file = "file.R")
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE, warning = FALSE)
+Sys.setlocale("LC_TIME", "en_US.UTF-8")
+```
+
+### 1. Reading the dataset
+```{r reading_data, results = "hide"}
+DF <- read.table("../data/activity.csv", sep = ",", header = TRUE, na.strings = "NA")
+DF$date <- as.Date(DF$date)
+```
+
+### 2. Evaluating & drawing the total number of steps taken each day 
+```{r total_steps_drawing, fig.width = 10}
+library(plyr)
+total_activity <- ddply(DF, .(date), summarize, Sum = sum(steps, na.rm = TRUE))
+
+plot(total_activity, type = "b", pch = 19, xaxt = "n",
+     main = "Total number of steps taken each day\n in October-November",
+     ylab = "Total number of steps", xlab = "Date")
+  axis.Date(side = 1, at = seq(min(DF$date),
+                               max(DF$date), by = "days"), format = "%m/%d\n (%a)", cex.axis = .7)
+```
+
+### 3. Evaluating & listing mean and median numbers of steps taken each day
+```{r mean_median_steps_listing}
+mean_activity <- ddply(DF, .(date), summarize, Mean = mean(steps, na.rm = TRUE))
+median_activity <- ddply(DF, .(date), summarize, Median = median(steps, na.rm = TRUE))
+actDF <- data.frame(Date = unique(as.character(DF$date)), 
+                    Mean = ceiling(mean_activity$Mean), 
+                    Median = ceiling(median_activity$Median))
+actDF
+```
+
+### 4. Drawing average (mean) and median numbers of steps time series
+```{r mean_median_steps_drawing, fig.width = 10}
+plot(mean_activity, type = "b", pch = 19, xaxt = "n", col = "darkblue",
+     main = "Mean and median numbers of steps taken each day\n in October-November",
+     ylab = "Mean and median numbers of steps", xlab = "Date")
+  points(median_activity, type = "b", pch = 19, col = "darkgreen")
+  axis.Date(side = 1, at = seq(min(DF$date),
+                               max(DF$date), by = "days"), format = "%m/%d\n (%a)", cex.axis = .7)
+  legend("topleft", pch = 19, col = c("darkblue", "darkgreen"),
+         legend = c("steps mean", "steps median"))
+```
+
+### 5. Evaluate the 5-minute interval that, on average, contains the maximum number of steps
+```{r max_num_steps_interval}
+DF[which.max(DF$steps), ]
+```
+
+### 6. Describing and showing a strategy for imputing missing data
+
+Exploratory analysis showed that NA values presented in no single value but as large NA-sequences - most likely corresponding to the time when the traction device was discharged.
+
+In this case, the most appropriate way is to restore NA values by analyzing the number of steps equivalent to the values in time intervals of all other days for which the data values are not skipped.
+
+Suchlike approach can be automatically implemented by the 'nearest neighbor averaging' (kNN) algorithm and can be used out of the 'VIM' CRAN-package, for example.
+```{r days_with_NA_val, fig.width = 10}
+NAvect <- is.na(DF$steps)
+plot(NAvect, type = "l", yaxt = "n", xaxt = "n",
+     main = "8 days with 5-min intervals NA-values\n in October-November",
+     ylab = "NA-value indicator", xlab = "Intervals mapped to days")
+  axis(side = 2, at = 0:1, labels = c("FALSE", "TRUE"), cex.axis = .7)  
+  axis(1, at = seq(0, 17568-1, 288), labels = format(unique(DF$date), "%m/%d\n (%a)"), cex.axis = .7)
+```
+
+```{r imputing_data, results = "hide"}
+library(VIM)
+DFrecovery <- kNN(DF, variable = c("steps"),
+                  dist_var = c("date", "interval"))
+```
+
+### 7. Drawing the histogram of the total number of steps taken each day after missing values are imputed
+```{r imp_data_hist, fig.width = 10}
+plot(DFrecovery$steps, type = "l", col = "blue",
+     main = "The total number of steps per 5-min interval\n (incl. imputed values based on kNN)",
+     ylab = "Number of Steps", xlab = "5-min Interval Observations")
+  lines(DF$steps)
+  legend("topleft", pch = 19, col = c("blue"), legend = c("imputed values"))
+```
+
+### 8. Drawing the Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
+```{r compare_num_steps, fig.width = 10}
+library(dplyr)
+DFtmp <- cbind(DF, wday = as.POSIXlt(DF$date)$wday) # using because of dplyr::mutate conflicts with 'knit'
+DFwday <- summarize(group_by(DFtmp, interval, wday), meansteps = mean(steps, na.rm = TRUE)) 
+
+library(lattice)
+xyplot(meansteps ~ interval | wday, DFwday, type = "l", 
+       xlab = "Intervals", ylab = "Average Number of Steps",
+       layout = c(1, 7), as.table = TRUE, strip = FALSE,    # draw top-to-bottom panels without labels
+       panel = function(x = interval, y = meansteps, ...) {
+         panel.xyplot(x, y,...)
+         panel.text(0, 0.85*max(DFwday$meansteps), 
+                    labels = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday",
+                               "Friday", "Saturday")[which.packet()])
+       })
+```
+
+### 9. All of the R code needed to reproduce the results (numbers, plots, etc.) in the report
+```{r all_code, eval = FALSE}
+Sys.setlocale("LC_TIME", "en_US.UTF-8")
+
+# 1. Reading the dataset
+DF <- read.table("../data/activity.csv", sep = ",", header = TRUE, na.strings = "NA")
+DF$date <- as.Date(DF$date)
+
+# 2. Evaluating & drawing the total number of steps taken each day 
+library(plyr)
+total_activity <- ddply(DF, .(date), summarize, Sum = sum(steps, na.rm = TRUE))
+
+plot(total_activity, type = "b", pch = 19, xaxt = "n",
+     main = "Total number of steps taken each day\n in October-November",
+     ylab = "Total number of steps", xlab = "Date")
+  axis.Date(side = 1, at = seq(min(DF$date),
+                               max(DF$date), by = "days"), format = "%m/%d\n (%a)", cex.axis = .7)
+
+# 3. Evaluating & listing mean and median numbers of steps taken each day
+mean_activity <- ddply(DF, .(date), summarize, Mean = mean(steps, na.rm = TRUE))
+median_activity <- ddply(DF, .(date), summarize, Median = median(steps, na.rm = TRUE))
+actDF <- data.frame(Date = unique(as.character(DF$date)), 
+                    Mean = ceiling(mean_activity$Mean), 
+                    Median = ceiling(median_activity$Median))
+actDF
+
+# 4. Drawing average (mean) and median numbers of steps time series
+plot(mean_activity, type = "b", pch = 19, xaxt = "n", col = "darkblue",
+     main = "Mean and median numbers of steps taken each day\n in October-November",
+     ylab = "Mean and median numbers of steps", xlab = "Date")
+  points(median_activity, type = "b", pch = 19, col = "darkgreen")
+  axis.Date(side = 1, at = seq(min(DF$date),
+                               max(DF$date), by = "days"), format = "%m/%d\n (%a)", cex.axis = .7)
+  legend("topleft", pch = 19, col = c("darkblue", "darkgreen"),
+         legend = c("steps mean", "steps median"))
+
+# 5. Evaluate the 5-minute interval that, on average, contains the maximum number of steps
+DF[which.max(DF$steps), ]
+
+# 6. Describing and showing a strategy for imputing missing data
+NAvect <- is.na(DF$steps)
+plot(NAvect, type = "l", yaxt = "n", xaxt = "n",
+     main = "8 days with 5-min intervals NA-values\n in October-November",
+     ylab = "NA-value indicator", xlab = "Intervals mapped to days")
+  axis(side = 2, at = 0:1, labels = c("FALSE", "TRUE"), cex.axis = .7)  
+  axis(1, at = seq(0, 17568-1, 288), labels = format(unique(DF$date), "%m/%d\n (%a)"), cex.axis = .7)
+
+library(VIM)
+DFrecovery <- kNN(DF, variable = c("steps"),
+                  dist_var = c("date", "interval"))
+
+# 7. Drawing the histogram of the total number of steps taken each day after missing values are imputed
+plot(DFrecovery$steps, type = "l", col = "blue",
+     main = "The total number of steps per 5-min interval\n (incl. imputed values based on kNN)",
+     ylab = "Number of Steps", xlab = "5-min Interval Observations")
+  lines(DF$steps)
+  legend("topleft", pch = 19, col = c("blue"), legend = c("imputed values"))
+
+# 8. Drawing the Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
+library(dplyr)
+DFtmp <- cbind(DF, wday = as.POSIXlt(DF$date)$wday) # using because of dplyr::mutate conflicts with 'knit' evaluating
+DFwday <- summarize(group_by(DFtmp, interval, wday), meansteps = mean(steps, na.rm = TRUE)) 
+
+library(lattice)
+xyplot(meansteps ~ interval | wday, DFwday, type = "l", 
+       xlab = "Intervals", ylab = "Average Number of Steps",
+       layout = c(1, 7), as.table = TRUE, strip = FALSE,    # draw top-to-bottom panels (as.table = TRUE) & without panels' labels (strip = FALSE)
+       panel = function(x = interval, y = meansteps, ...) {
+         panel.xyplot(x, y,...)
+         panel.text(0, 0.85*max(DFwday$meansteps), 
+                    labels = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday",
+                               "Friday", "Saturday")[which.packet()])
+       })
+```

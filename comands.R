@@ -20,7 +20,7 @@ setwd("./datadir") # relative path: go to datadir
 ??anyfunc # deep searching
 anyfunc # show fixed arguments and ... arguments (and environment of func)
 args(anyfunc) # show function's arguments
-str(anyfunc) # show function's arguments too
+str(anyfunc_or_anyobj) # show function's arguments or object's structure
 search() # show loaded packages (environments)
 
 object.size(x) # get data object size in bytes
@@ -309,12 +309,13 @@ summarize(group_by(DF, aggregatecol)) # agregate (by 'group_by') and show differ
 summarize(group_by(DF, aggregatecol), min(colX), max(colX), mean(colX)) # agregate (by 'group_by') and evaluate expressions
 
 tempDF <- mutate(DF, year = as.POSIXlt(datecol)$year + 1900)
+# tempDF <- cbind(DF, wday = as.POSIXlt(DF$date)$wday) # BUT use this way with 'knit'! because of dplyr::mutate conflicts with 'knit' evaluating
 DF <- summarize(group_by(tempDF, year), min(colX), max(colX), spec_colname = mean(colX)) # agregate data by year value extracted from 'datacol' variable
 DF <- summarize_each(group_by(tempDF, aggrCol1, aggrCol2), funs(mean)) # summarize function for each columns except of columns aggregated by
 # 'pipeline' instructions provided by 'dplyr'
 DF %>% mutate(month = as.POSIXlt(datecol)$mon + 1) %>% group_by(month) %>% summarize(col1 = min(colX), col2 = max(col2), col3 = mean(colX)) # get from DF 'month' & 'col1', 'col2', 'col3' (by aggregation) as data frame
 
-mydata.averages <- aggregate(mydata[,4:89],list(mydata$Subject_ID,mydata$Activity), mean) # yet another way to aggregate
+mydata.averages <- aggregate(mydata[, 4:89], list(mydata$Subject_ID, mydata$Activity), mean) # yet another way to aggregate
 
 library(reshape2)
 moltenDF <- melt(DF, id = c("carname", "gear", "cyl"), measure.vars = c("mpg", "hp")) # get DF with rows where 'carname - gear - cyl' are duplicated & 'variable - value' are different ("mpg" in top rows, "hp" in lower)
@@ -498,12 +499,19 @@ bad <- is.na(x)
 x[!bad]
 
 y <- c("a", "b", NA, "c", NA, "d")
-good <- complete.cases(x, y) # there is no NA elements,ALSO: works with matrix name analyzing rows' data 
+good <- complete.cases(x, y) # there is no NA elements, ALSO: works with matrix name analyzing rows' data 
 y[good]
 
 library(impute) # to install: source("https://bioconductor.org/biocLite.R"); biocLite("impute")
+DM <- rnorm(100)
 DM[sample(1:100, size = 40, replace = FALSE)] <- NA # generate 40 random indexes from 1 to 100 and write corresponding values of DM as NA
 DMrecovery <- impute.knn(DM)$data # imputing NA values using 'k' nearest neighbor averaging (by default k = 10)
+
+library(VIM)
+DMrecovery <- kNN(DM) # automatically working way
+
+library(DMwR)
+DMrecovery <- knnImputation(DM)
 
 
 ## Vectors and Matrix operations
@@ -620,10 +628,10 @@ sapply(split(x, f), mean) # another way to tapply
 unlist(lapply(split(x, f), mean))
 
 library(plyr)
-ddply(DF, .(f), summarize, sum = sum(x)) # another way to agregate and evaluate expression (f, x - factor and val columns of DF)
-ddply(DF, .(f), summarize, sum = ave(x, FUN = sum)) # using ave() if needs to duplicate sum result for each element of every factor group
+ddply(DF, .(f), summarize, sum = sum(x)) # another way to agregate and evaluate expression (f - factor, x - val column of DF)
+ddply(DF, .(f), summarize, sum = ave(x, FUN = sum)) # using ave() if needs to duplicate common sum result for each element of every factor group
 
-ddply(DF, .(f1, f2), summarize, sum = sum(x)) # apply for combination of factors
+ddply(DF, .(f1, f2), summarize, sum = sum(x, na.rm = TRUE)) # apply for combination of factors
 
 DF <- as.data.frame(do.call("rbind", ListOfChrVect))
 
@@ -806,9 +814,9 @@ con <- file("file.txt", "rw")
 data <- read.csv(con)
 close(con)
 
-DF <- read.table("./data/file.csv", sep = ",", header = TRUE, quote="", na = "?") # default separator = space
-DF <- read.table("./data/file.csv", sep = ",", header = TRUE, quote="", na.strings = "") # 'na.strings' equals to 'na' argument
-DF <- read.table("./data/file.csv", sep = ",", header = TRUE, quote="", na.strings = "", comment.char = "#")
+DF <- read.table("./data/file.csv", sep = ",", header = TRUE, quote = "", na = "?") # default separator = space
+DF <- read.table("./data/file.csv", sep = ",", header = TRUE, quote = "", na.strings = "") # 'na.strings' equals to 'na' argument
+DF <- read.table("./data/file.csv", sep = ",", header = TRUE, quote = "", na.strings = "", comment.char = "#")
 DF <- read.table(textConnection(gsub("-", "\t", readLines(url))), header = TRUE, skip = 2) # change '-' to white space & skip first strings
 head(DF) # 1st 6 text strings
 
